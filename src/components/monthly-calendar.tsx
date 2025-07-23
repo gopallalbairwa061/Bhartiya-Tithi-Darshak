@@ -1,14 +1,18 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, getDay } from "date-fns";
+import { ChevronLeft, ChevronRight, Moon, Star } from "lucide-react";
+import { format, getDay, getYear, getMonth } from "date-fns";
 import { hi } from "date-fns/locale";
-import { DayProps } from "react-day-picker";
+import { DayProps, DayPicker } from "react-day-picker";
+import { getPanchangForMonth, PanchangData } from "@/services/panchang";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+
 
 type Festival = {
   name: string;
@@ -20,7 +24,6 @@ interface MonthlyCalendarProps {
   festivals: Festival[];
 }
 
-// Helper to parse dates like "नवंबर 1, 2024" which is not standard
 const monthMap: { [key: string]: number } = {
   'जनवरी': 0, 'फरवरी': 1, 'मार्च': 2, 'अप्रैल': 3, 'मई': 4, 'जून': 5,
   'जुलाई': 6, 'अगस्त': 7, 'सितंबर': 8, 'अक्टूबर': 9, 'नवंबर': 10, 'दिसंबर': 11
@@ -38,7 +41,6 @@ const parseHindiDate = (dateString: string): Date | null => {
       return new Date(year, month, day);
     }
   }
-  // Try standard parsing as a fallback
   const parsedDate = new Date(dateString);
   if (!isNaN(parsedDate.getTime())) {
     return parsedDate;
@@ -49,6 +51,27 @@ const parseHindiDate = (dateString: string): Date | null => {
 
 export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
   const [date, setDate] = useState<Date>(new Date());
+  const [panchangData, setPanchangData] = useState<Map<string, PanchangData>>(new Map());
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPanchangData = async () => {
+      setIsLoading(true);
+      const year = getYear(date);
+      const month = getMonth(date);
+      try {
+        const data = await getPanchangForMonth(year, month);
+        const map = new Map<string, PanchangData>();
+        data.forEach(p => map.set(p.date, p));
+        setPanchangData(map);
+      } catch (error) {
+        console.error("Failed to fetch panchang data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPanchangData();
+  }, [date]);
 
   const festivalsByDate = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -65,7 +88,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     return map;
   }, [festivals]);
 
-  const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - 10 + i);
+  const years = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - 1 + i); // 2023 to 2026
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: i,
     label: format(new Date(2000, i), "LLLL", { locale: hi }),
@@ -82,14 +105,31 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     newDate.setMonth(parseInt(month, 10));
     setDate(newDate);
   };
+  
+  const selectedDayPanchang = panchangData.get(format(date, "yyyy-MM-dd"));
 
-  const DayWithFestival = (props: DayProps) => {
+  const DayWithDetails = (props: DayProps) => {
     const dateStr = format(props.date, "yyyy-MM-dd");
     const dayFestivals = festivalsByDate.get(dateStr);
+    const dayPanchang = panchangData.get(dateStr);
+    const dayNumber = props.date.getDate().toLocaleString('hi-IN');
 
     return (
-      <div className="relative h-full w-full flex items-center justify-center">
-        <span>{props.date.getDate().toLocaleString('hi-IN')}</span>
+      <div className="relative h-full w-full flex flex-col items-center justify-start p-1 gap-0.5">
+        <div className="flex-grow-0 font-semibold">{dayNumber}</div>
+        {isLoading ? (
+            <div className="flex-grow flex flex-col justify-center items-center w-full gap-1">
+                <Skeleton className="h-2 w-10/12" />
+                <Skeleton className="h-2 w-8/12" />
+            </div>
+        ) : (
+            dayPanchang && (
+            <div className="flex-grow text-[10px] text-muted-foreground leading-tight text-center">
+              <p className="truncate">{dayPanchang.tithi.split(', ')[1]}</p>
+              <p className="truncate">{dayPanchang.nakshatra}</p>
+            </div>
+          )
+        )}
         {dayFestivals && (
           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex space-x-0.5">
             {dayFestivals.slice(0, 3).map((_, index) => (
@@ -145,19 +185,33 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
             months: "p-0",
             month: "p-3",
             caption: "hidden",
-            head_cell: "w-10 sm:w-12 md:w-14 text-muted-foreground font-medium",
-            cell: "h-12 sm:h-14 md:h-16 text-center text-base p-0 relative",
+            head_cell: "w-12 sm:w-14 md:w-16 text-muted-foreground font-medium",
+            cell: "h-20 sm:h-24 md:h-28 text-center text-sm p-0 relative",
             day: "h-full w-full p-1",
-            day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md",
-            day_today: "bg-accent text-accent-foreground rounded-md",
+            day_selected: "bg-primary/20 text-primary-foreground rounded-md",
+            day_today: "bg-accent/50 text-accent-foreground rounded-md",
+            day_outside: "text-muted-foreground/50",
         }}
         components={{
-            Day: DayWithFestival
+            Day: DayWithDetails
         }}
         footer={
-            <div className="p-3 border-t text-sm space-y-1">
-                <strong className="font-semibold">आज के त्यौहार:</strong> 
-                <p className="text-muted-foreground">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
+            <div className="p-3 border-t text-sm space-y-2">
+                <div className="space-y-1">
+                    <strong className="font-semibold">{format(date, "d MMMM, yyyy", { locale: hi })}</strong> 
+                    {isLoading ? <Skeleton className="h-4 w-48 mt-1" /> : (
+                        selectedDayPanchang && (
+                        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
+                            <span className="flex items-center gap-1.5"><Moon size={14} className="text-primary"/> {selectedDayPanchang.tithi}</span>
+                            <span className="flex items-center gap-1.5"><Star size={14} className="text-primary"/> {selectedDayPanchang.nakshatra}</span>
+                        </div>
+                    ))}
+                </div>
+                <Separator/>
+                <div>
+                  <strong className="font-semibold">त्योहार:</strong> 
+                  <p className="text-muted-foreground">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
+                </div>
             </div>
         }
       />
