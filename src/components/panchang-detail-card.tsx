@@ -14,12 +14,12 @@ const DetailRow = ({ icon, label, value, isLoading }: { icon: React.ReactNode; l
   <div className="flex justify-between items-center py-2 text-base">
     <div className="flex items-center gap-3">
       <div className="h-5 w-5 text-muted-foreground flex-shrink-0">{icon}</div>
-      <p className="font-semibold text-foreground/90">{label}</p>
+      <p className="font-semibold text-foreground/90 flex-shrink-0">{label}</p>
     </div>
     {isLoading ? (
       <Skeleton className="h-4 w-32" />
     ) : (
-      <p className="text-muted-foreground font-medium text-right">{value || "अनुपलब्ध"}</p>
+      <p className="text-muted-foreground font-medium text-right ml-2">{value || "अनुपलब्ध"}</p>
     )}
   </div>
 );
@@ -45,7 +45,7 @@ const MuhuratRow = ({ icon, label, value, isLoading, type }: { icon: React.React
           {isLoading ? (
             <Skeleton className="h-4 w-32" />
           ) : (
-            <Badge variant={badgeVariant[type]} className="bg-opacity-20 text-base">
+            <Badge variant={badgeVariant[type]} className="bg-opacity-20 text-base font-normal">
                 {value || "अनुपलब्ध"}
             </Badge>
           )}
