@@ -85,7 +85,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
   return (
     <Card className="w-full h-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">त्योहार और कैलेंडर</CardTitle>
+        <CardTitle className="font-headline text-2xl text-accent">मासिक कैलेंडर</CardTitle>
       </CardHeader>
       <CardContent>
          <Tabs defaultValue="calendar">
