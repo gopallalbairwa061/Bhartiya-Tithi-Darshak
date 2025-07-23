@@ -1,7 +1,7 @@
 
 'use server';
 
-import { format, eachDayOfInterval, startOfMonth, endOfMonth, addMonths, getDaysInMonth } from 'date-fns';
+import { format, eachDayOfInterval, startOfMonth, endOfMonth, differenceInDays, startOfYear } from 'date-fns';
 import { hi } from 'date-fns/locale';
 
 interface Detail {
@@ -42,53 +42,90 @@ const karanas = [
     "बव", "बालव", "कौलव", "तैतिल", "गर", "वणिज", "विष्टि", "शकुनि", "चतुष्पाद", "नाग", "किंस्तुघ्न"
 ];
 
-const formatTime = (hour: number, minute: number, period: "सुबह" | "शाम" | "दोपहर" | "रात") => {
-    return `${period} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')} तक`;
+// Base values for a known date (e.g., Jan 1, 2024) to make calculations look real
+const aharGanaBaseDate = new Date(2024, 0, 1);
+// These are reference indices for the base date. In a real scenario, these would be accurately calculated.
+const baseTithiIndex = 19; // Example: Krishna Paksha Panchami
+const baseNakshatraIndex = 13; // Example: Hasta
+const baseYogaIndex = 3; // Example: Saubhagya
+
+// Approximate durations in decimal days
+const tithiDuration = 0.98;
+const nakshatraDuration = 1.02;
+const yogaDuration = 0.95;
+
+
+const formatTime = (decimalHours: number) => {
+    const totalMinutes = Math.floor(decimalHours * 60);
+    const hours = Math.floor(totalMinutes / 60) % 24;
+    const minutes = totalMinutes % 60;
+    let period = "सुबह";
+    if (hours >= 12) period = "दोपहर";
+    if (hours >= 16) period = "शाम";
+    if (hours >= 20 || hours < 4) period = "रात";
+    
+    const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+
+    return `${period} ${displayHour.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} तक`;
 };
 
-// This is a simplified mock data generator. 
-// For a real application, you'd use a proper astronomical library.
+// This is a more realistic mock data generator. 
+// It simulates the progression of panchang elements.
 export async function getPanchangForMonth(year: number, month: number): Promise<PanchangData[]> {
-  const startDate = new Date(year, month, 1);
+  const startDate = startOfMonth(new Date(year, month));
   const endDate = endOfMonth(startDate);
   const dates = eachDayOfInterval({ start: startDate, end: endDate });
 
-  // A simple pseudo-random starting point to make the data look varied
-  const seed = year + month * 12;
+  return dates.map((date) => {
+    const daysSinceBase = differenceInDays(date, aharGanaBaseDate);
 
-  return dates.map((date, index) => {
-    const daySeed = seed + index;
-
-    const tithiIndex = daySeed % tithis.length;
-    const nakshatraIndex = daySeed % nakshatras.length;
-    const yogaIndex = daySeed % yogas.length;
-    const karanaIndex = daySeed % karanas.length;
+    // Calculate indices based on progression
+    const tithiIndex = Math.floor(baseTithiIndex + (daysSinceBase / tithiDuration)) % tithis.length;
+    const nakshatraIndex = Math.floor(baseNakshatraIndex + (daysSinceBase / nakshatraDuration)) % nakshatras.length;
+    const yogaIndex = Math.floor(baseYogaIndex + (daysSinceBase / yogaDuration)) % yogas.length;
     
+    // Karanas are two per tithi
+    const karanaBaseIndex = tithiIndex * 2;
+    const karanaIndex1 = karanaBaseIndex % karanas.length;
+    const karanaIndex2 = (karanaBaseIndex + 1) % karanas.length;
+
     // Determine Paksha based on tithi index
     const paksha = tithiIndex < 15 ? "शुक्ल पक्ष" : "कृष्ण पक्ष";
 
-    const sunriseHour = 5 + ((daySeed * 3) % 2); // 5 or 6
-    const sunriseMinute = (daySeed * 7) % 60;
-    const sunsetHour = 6 + ((daySeed * 5) % 2); // 6 or 7
-    const sunsetMinute = (daySeed * 11) % 60;
+    // Simulate sunrise/sunset variation
+    const dayOfYear = differenceInDays(date, startOfYear(date));
+    const seasonalFactor = Math.sin((dayOfYear - 80) * (2 * Math.PI) / 365.25); // Simple sine wave for seasonal change
+    
+    const sunriseBase = 6.0; // 6:00 AM
+    const sunsetBase = 18.0; // 6:00 PM
+    const sunriseHour = sunriseBase - seasonalFactor;
+    const sunsetHour = sunsetBase + seasonalFactor;
+
+    const sunriseMinutes = Math.floor((sunriseHour % 1) * 60);
+    const sunsetMinutes = Math.floor((sunsetHour % 1) * 60);
+
+    const tithiEndTimeDecimal = (daysSinceBase / tithiDuration) % 1 * 24;
+    const nakshatraEndTimeDecimal = (daysSinceBase / nakshatraDuration) % 1 * 24;
+    const yogaEndTimeDecimal = (daysSinceBase / yogaDuration) % 1 * 24;
+    const karanaEndTimeDecimal = ((daysSinceBase / tithiDuration) * 2 % 1) * 12;
 
     return {
       date: format(date, 'yyyy-MM-dd'),
       tithi: `${paksha}, ${tithis[tithiIndex]}`,
       nakshatra: {
         name: nakshatras[nakshatraIndex],
-        endTime: formatTime((daySeed % 24), (daySeed*2 % 60), "रात")
+        endTime: formatTime(nakshatraEndTimeDecimal)
       },
       yoga: {
         name: yogas[yogaIndex],
-        endTime: formatTime((daySeed*3 % 12), (daySeed*4 % 60), "शाम")
+        endTime: formatTime(yogaEndTimeDecimal)
       },
       karana: {
-        name: karanas[karanaIndex],
-        endTime: formatTime((daySeed*5 % 12), (daySeed*6 % 60), "दोपहर")
+        name: `${karanas[karanaIndex1]}, ${karanas[karanaIndex2]}`,
+        endTime: formatTime(karanaEndTimeDecimal)
       },
-      sunrise: `सुबह ${sunriseHour.toString().padStart(2, '0')}:${sunriseMinute.toString().padStart(2, '0')}`,
-      sunset: `शाम 0${sunsetHour}:${sunsetMinute.toString().padStart(2, '0')}`,
+      sunrise: `सुबह ${Math.floor(sunriseHour).toString().padStart(2, '0')}:${sunriseMinutes.toString().padStart(2, '0')}`,
+      sunset: `शाम ${Math.floor(sunsetHour).toString().padStart(2, '0')}:${sunsetMinutes.toString().padStart(2, '0')}`,
     };
   });
 }
