@@ -12,6 +12,9 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { BrainCircuit } from "lucide-react";
+
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -77,7 +80,11 @@ export default function Home() {
           <p className="text-lg md:text-xl text-muted-foreground mt-2 animate-fade-in">
             {currentDateTime ? `${currentDateTime} | ${vsDateString}` : <span className="inline-block h-6 w-96 bg-primary/20 rounded animate-pulse"></span>}
           </p>
-          <div className="absolute top-0 right-0">
+          <div className="absolute top-0 right-0 flex items-center gap-2">
+            <Button variant="outline">
+              <BrainCircuit className="mr-2 h-4 w-4" />
+              प्रश्नोत्तरी
+            </Button>
             <ThemeToggle />
           </div>
         </header>
