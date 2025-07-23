@@ -53,7 +53,7 @@ export default function Home() {
       </main>
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50 mt-8">
         <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
-        <p className="mt-2">Made in India by Mahendra Bairwa</p>
+        <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
     </div>
   );
