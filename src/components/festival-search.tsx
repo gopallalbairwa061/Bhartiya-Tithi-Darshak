@@ -85,7 +85,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
   return (
     <Card className="w-full h-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">मासिक कैलेंडर</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">मासिक कैलेंडर</CardTitle>
       </CardHeader>
       <CardContent>
          <Tabs defaultValue="calendar">
@@ -112,7 +112,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
               <ul className="space-y-4">
                 {filteredFestivals.length > 0 ? (
                   filteredFestivals.map((festival) => (
-                    <li key={`${festival.name}-${festival.date}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-background/80 transition-colors duration-200 cursor-pointer">
+                    <li key={`${festival.name}-${festival.date}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors duration-200 cursor-pointer">
                       {getIcon(festival.icon)}
                       <div>
                         <p className="font-semibold text-lg">{festival.name}</p>

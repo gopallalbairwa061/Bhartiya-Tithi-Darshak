@@ -29,7 +29,7 @@ export function SunTimesCard({ panchang, isLoading }: SunTimesCardProps) {
     return (
         <Card className="w-full shadow-lg">
             <CardHeader>
-                <CardTitle className="font-headline text-2xl text-accent">सूर्योदय और सूर्यास्त</CardTitle>
+                <CardTitle className="font-headline text-2xl text-primary">सूर्योदय और सूर्यास्त</CardTitle>
                 <CardDescription>{location}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-5 text-lg">

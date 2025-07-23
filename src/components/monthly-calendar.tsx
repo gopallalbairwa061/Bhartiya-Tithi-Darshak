@@ -143,7 +143,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
                     <span className="text-xs text-muted-foreground">{format(props.date, 'cccc', { locale: hi })}</span>
                     <span className={cn("text-3xl lg:text-4xl font-bold", isSunday && "text-destructive")}>{dayNumber.toLocaleString('hi-IN')}</span>
                      {dayFestivals && dayFestivals.map(f => (
-                        <span key={f.name} className="mt-1 text-[10px] font-semibold text-red-500 leading-tight tracking-tighter text-center">
+                        <span key={f.name} className="mt-1 text-[10px] font-semibold text-primary leading-tight tracking-tighter text-center">
                            {f.name}
                         </span>
                     ))}
@@ -181,7 +181,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center p-2 rounded-md bg-background/50">
+      <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
         <Button variant="outline" size="icon" onClick={() => setCurrentMonth(d => new Date(d.setMonth(d.getMonth() - 1)))}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -222,14 +222,14 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
         className="rounded-md p-0"
         classNames={{
             months: "p-0",
-            month: "p-3",
+            month: "p-3 space-y-4",
             caption: "hidden",
-            head_row: "hidden",
-            head_cell: "w-full text-muted-foreground font-medium",
-            cell: "h-36 text-center text-sm p-0 relative first:border-l",
-            row: "flex w-full border-r",
+            head_row: "grid grid-cols-7",
+            head_cell: "text-muted-foreground font-medium text-sm",
+            cell: "h-32 md:h-36 lg:h-40 text-center text-sm p-0 relative first:border-l",
+            row: "grid grid-cols-7 w-full border-r",
             day: "h-full w-full p-0",
-            day_selected: "bg-primary/20 text-primary-foreground rounded-none",
+            day_selected: "bg-primary/20 text-primary-foreground rounded-none ring-2 ring-primary",
             day_today: "bg-accent/50 text-accent-foreground rounded-none",
             day_outside: "text-muted-foreground/50 bg-background/50",
         }}

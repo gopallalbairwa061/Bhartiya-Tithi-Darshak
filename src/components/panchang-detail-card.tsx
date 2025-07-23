@@ -13,7 +13,7 @@ interface PanchangDetailCardProps {
 const DetailRow = ({ icon, label, value, isLoading }: { icon: React.ReactNode; label: string; value?: string; isLoading: boolean }) => (
   <div className="flex justify-between items-center py-2 text-base">
     <div className="flex items-center gap-3">
-      <div className="h-5 w-5 text-secondary flex-shrink-0">{icon}</div>
+      <div className="h-5 w-5 text-muted-foreground flex-shrink-0">{icon}</div>
       <p className="font-semibold text-foreground/90">{label}</p>
     </div>
     {isLoading ? (
@@ -24,28 +24,41 @@ const DetailRow = ({ icon, label, value, isLoading }: { icon: React.ReactNode; l
   </div>
 );
 
-const MuhuratRow = ({ icon, label, value, isLoading, type }: { icon: React.ReactNode; label: string; value?: string; isLoading: boolean, type: 'good' | 'bad' }) => (
-    <div className="flex justify-between items-center py-2 text-base">
-      <div className="flex items-center gap-3">
-        <div className={`h-5 w-5 ${type === 'good' ? 'text-green-500' : 'text-red-500'} flex-shrink-0`}>{icon}</div>
-         <p className="font-semibold text-foreground/90">{label}</p>
-      </div>
-      {isLoading ? (
-        <Skeleton className="h-4 w-32" />
-      ) : (
-        <Badge variant={type === 'good' ? 'default' : 'destructive'} className="bg-opacity-20 text-base">
-            {value || "अनुपलब्ध"}
-        </Badge>
-      )}
-    </div>
-);
+const MuhuratRow = ({ icon, label, value, isLoading, type }: { icon: React.ReactNode; label: string; value?: string; isLoading: boolean, type: 'good' | 'bad' | 'neutral' }) => {
+    const typeClasses = {
+        good: 'text-green-600 dark:text-green-500',
+        bad: 'text-red-600 dark:text-red-500',
+        neutral: 'text-yellow-600 dark:text-yellow-500'
+    };
+    const badgeVariant = {
+        good: 'default',
+        bad: 'destructive',
+        neutral: 'secondary'
+    } as const;
+    
+    return (
+        <div className="flex justify-between items-center py-2 text-base">
+          <div className="flex items-center gap-3">
+            <div className={`h-5 w-5 ${typeClasses[type]} flex-shrink-0`}>{icon}</div>
+             <p className="font-semibold text-foreground/90">{label}</p>
+          </div>
+          {isLoading ? (
+            <Skeleton className="h-4 w-32" />
+          ) : (
+            <Badge variant={badgeVariant[type]} className="bg-opacity-20 text-base">
+                {value || "अनुपलब्ध"}
+            </Badge>
+          )}
+        </div>
+    );
+}
 
 
 export function PanchangDetailCard({ panchang, isLoading }: PanchangDetailCardProps) {
   return (
     <Card className="w-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">आज का पंचांग</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">आज का पंचांग</CardTitle>
       </CardHeader>
       <CardContent className="divide-y divide-border/50 -mt-2">
         <DetailRow icon={<Moon size={20} />} label="तिथि" value={panchang?.tithi} isLoading={isLoading} />
@@ -55,7 +68,7 @@ export function PanchangDetailCard({ panchang, isLoading }: PanchangDetailCardPr
         <MuhuratRow icon={<ShieldCheck size={20} />} label="अभिजीत मुहूर्त" value={panchang ? `${panchang.abhijitMuhurat.start} - ${panchang.abhijitMuhurat.end}` : undefined} isLoading={isLoading} type="good" />
         <MuhuratRow icon={<AlertTriangle size={20} />} label="राहु काल" value={panchang ? `${panchang.rahuKaal.start} - ${panchang.rahuKaal.end}` : undefined} isLoading={isLoading} type="bad" />
         <MuhuratRow icon={<ShieldAlert size={20} />} label="यमगण्डम" value={panchang ? `${panchang.yamagandam.start} - ${panchang.yamagandam.end}` : undefined} isLoading={isLoading} type="bad" />
-        <MuhuratRow icon={<Shield size={20} />} label="गुलिक काल" value={panchang ? `${panchang.gulikaKaal.start} - ${panchang.gulikaKaal.end}` : undefined} isLoading={isLoading} type="bad" />
+        <MuhuratRow icon={<Shield size={20} />} label="गुलिक काल" value={panchang ? `${panchang.gulikaKaal.start} - ${panchang.gulikaKaal.end}` : undefined} isLoading={isLoading} type="neutral" />
       </CardContent>
     </Card>
   );

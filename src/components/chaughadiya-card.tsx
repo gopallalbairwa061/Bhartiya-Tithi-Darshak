@@ -55,7 +55,7 @@ export function ChaughadiyaCard({ title }: ChaughadiyaCardProps) {
   return (
     <Card className="w-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">{title}</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">{title}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-3 text-base">
         {data.map((muhurat, index) => (

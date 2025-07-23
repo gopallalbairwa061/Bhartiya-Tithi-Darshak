@@ -43,7 +43,7 @@ export function SubscribeBanner() {
                         <BellRing className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-lg font-headline text-accent">सूचित रहें</CardTitle>
+                        <CardTitle className="text-lg font-headline text-primary">सूचित रहें</CardTitle>
                         <CardDescription className="text-sm">त्योहारों की सूचनाएं पाएं।</CardDescription>
                     </div>
                 </div>
