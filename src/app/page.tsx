@@ -279,7 +279,8 @@ export default function Home() {
             return <WinnerDetailsForm onSubmit={handleWinnerFormSubmit} />;
 
         case 'finished':
-            const message = dailyQuiz?.failed
+            const isFailure = dailyQuiz?.failed;
+            const message = isFailure
                 ? "आपका जवाब गलत है। बेहतर भाग्य अगली बार!"
                 : dailyQuiz?.submittedDetails 
                 ? "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।"
@@ -288,10 +289,18 @@ export default function Home() {
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
                     <h2 className="text-2xl font-bold">भाग लेने के लिए धन्यवाद!</h2>
                     <p className="text-muted-foreground">{message}</p>
-                    <Button onClick={() => setIsQuizOpen(false)} className="w-full">
-                        <HomeIcon className="mr-2 h-4 w-4"/>
-                        होम पेज पर जाएं
-                    </Button>
+                    <div className="w-full flex flex-col gap-2">
+                      {isFailure && (
+                        <Button onClick={resetQuiz} className="w-full">
+                          <RefreshCw className="mr-2 h-4 w-4"/>
+                          पुनः प्रयास करें
+                        </Button>
+                      )}
+                      <Button onClick={() => setIsQuizOpen(false)} variant="outline" className="w-full">
+                          <HomeIcon className="mr-2 h-4 w-4"/>
+                          होम पेज पर जाएं
+                      </Button>
+                    </div>
                 </div>
             )
 
@@ -370,3 +379,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
