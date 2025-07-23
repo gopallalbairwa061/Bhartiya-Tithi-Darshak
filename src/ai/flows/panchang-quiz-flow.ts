@@ -3,7 +3,7 @@
 /**
  * @fileOverview A flow for generating and evaluating quiz questions about Indian culture and Panchang.
  *
- * - generateQuestion - Generates a new quiz question.
+ * - generateQuestions - Generates a new quiz question.
  * - evaluateAnswer - Evaluates the user's answer to a quiz question.
  * - QuizQuestion - The type for a quiz question object.
  * - EvaluateAnswerInput - The input type for the evaluateAnswer function.
@@ -19,6 +19,10 @@ const QuizQuestionSchema = z.object({
   answer: z.string().describe('The correct answer to the question in Hindi.'),
 });
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
+
+const QuestionsSchema = z.object({
+  questions: z.array(QuizQuestionSchema),
+});
 
 // Schema for the input to the answer evaluation flow
 const EvaluateAnswerInputSchema = z.object({
@@ -36,10 +40,11 @@ const EvaluateAnswerOutputSchema = z.object({
 export type EvaluateAnswerOutput = z.infer<typeof EvaluateAnswerOutputSchema>;
 
 /**
- * Generates a quiz question.
+ * Generates a batch of quiz questions.
  */
-export async function generateQuestion(): Promise<QuizQuestion> {
-  return generateQuestionFlow();
+export async function generateQuestions(): Promise<QuizQuestion[]> {
+  const result = await generateQuestionsFlow();
+  return result.questions;
 }
 
 /**
@@ -51,18 +56,18 @@ export async function evaluateAnswer(input: EvaluateAnswerInput): Promise<Evalua
 
 
 const generateQuestionPrompt = ai.definePrompt({
-  name: 'generateQuizQuestionPrompt',
-  output: { schema: QuizQuestionSchema },
+  name: 'generateQuizQuestionsPrompt',
+  output: { schema: QuestionsSchema },
   prompt: `You are an expert on Indian culture, traditions, and the Hindu Panchang. 
-  Generate a single, interesting, and engaging quiz question in Hindi. 
-  The question should be suitable for a general audience.
-  Provide both the question and the correct answer.`,
+  Generate 10 unique, interesting, and engaging quiz questions in Hindi. 
+  The questions should be suitable for a general audience.
+  Provide both the question and the correct answer for each.`,
 });
 
-const generateQuestionFlow = ai.defineFlow(
+const generateQuestionsFlow = ai.defineFlow(
   {
-    name: 'generateQuestionFlow',
-    outputSchema: QuizQuestionSchema,
+    name: 'generateQuestionsFlow',
+    outputSchema: QuestionsSchema,
   },
   async () => {
     const { output } = await generateQuestionPrompt();

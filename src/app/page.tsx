@@ -7,17 +7,27 @@ import { FestivalSearch } from "@/components/festival-search";
 import { SunTimesCard } from "@/components/sun-times-card";
 import { ChaughadiyaCard } from "@/components/chaughadiya-card";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
-import { format, getYear, getMonth } from "date-fns";
+import { format, getYear, getMonth, isToday } from "date-fns";
 import { LoadingScreen } from "@/components/loading-screen";
 import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
-import { generateQuestion, evaluateAnswer, QuizQuestion } from "@/ai/flows/panchang-quiz-flow";
+import { generateQuestions, evaluateAnswer, QuizQuestion } from "@/ai/flows/panchang-quiz-flow";
+
+const QUIZ_STORAGE_KEY = 'dailyQuiz';
+
+type DailyQuiz = {
+  date: string; // YYYY-MM-DD
+  questions: QuizQuestion[];
+  answers: (null | { userAnswer: string; isCorrect: boolean })[];
+  completed: boolean;
+};
+
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -27,11 +37,11 @@ export default function Home() {
   const [initialLoad, setInitialLoad] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   
-  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result'>('idle');
-  const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
+  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'finished'>('idle');
+  const [dailyQuiz, setDailyQuiz] = useState<DailyQuiz | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
   const [quizResult, setQuizResult] = useState<{ isCorrect: boolean; summary: string } | null>(null);
-
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -71,35 +81,69 @@ export default function Home() {
     fetchPanchang();
   }, [selectedDate, initialLoad]);
 
+  // Load or generate quiz on open
   useEffect(() => {
     if (isQuizOpen && quizState === 'idle') {
-      handleGenerateQuestion();
+      loadOrGenerateQuiz();
     }
   }, [isQuizOpen, quizState]);
-
-  const handleGenerateQuestion = async () => {
+  
+  const loadOrGenerateQuiz = async () => {
     setQuizState('loading');
-    setUserAnswer("");
-    setQuizResult(null);
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const storedQuiz = localStorage.getItem(QUIZ_STORAGE_KEY);
+    
+    if (storedQuiz) {
+        const parsedQuiz: DailyQuiz = JSON.parse(storedQuiz);
+        if (parsedQuiz.date === todayStr) {
+            setDailyQuiz(parsedQuiz);
+            const firstUnanswered = parsedQuiz.answers.findIndex(a => a === null);
+            setCurrentQuestionIndex(firstUnanswered === -1 ? 0 : firstUnanswered);
+            if (parsedQuiz.completed) {
+                setQuizState('finished');
+            } else {
+                setQuizState('question');
+            }
+            return;
+        }
+    }
+
     try {
-      const question = await generateQuestion();
-      setCurrentQuestion(question);
-      setQuizState('question');
+        const questions = await generateQuestions();
+        const newQuiz: DailyQuiz = {
+            date: todayStr,
+            questions,
+            answers: Array(10).fill(null),
+            completed: false,
+        };
+        localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(newQuiz));
+        setDailyQuiz(newQuiz);
+        setCurrentQuestionIndex(0);
+        setQuizState('question');
     } catch (error) {
-      console.error("Error generating question:", error);
-      setQuizState('idle');
+        console.error("Error generating questions:", error);
+        setQuizState('idle');
     }
   };
 
   const handleEvaluateAnswer = async () => {
-    if (!userAnswer.trim() || !currentQuestion) return;
+    if (!userAnswer.trim() || !dailyQuiz) return;
     setQuizState('evaluating');
+    
+    const currentQuestion = dailyQuiz.questions[currentQuestionIndex];
     try {
       const result = await evaluateAnswer({
         question: currentQuestion.question,
         answer: currentQuestion.answer,
         userAnswer: userAnswer,
       });
+
+      const newAnswers = [...dailyQuiz.answers];
+      newAnswers[currentQuestionIndex] = { userAnswer, isCorrect: result.isCorrect };
+      const updatedQuiz = { ...dailyQuiz, answers: newAnswers };
+      setDailyQuiz(updatedQuiz);
+      localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
+
       setQuizResult(result);
       setQuizState('result');
     } catch (error) {
@@ -108,10 +152,119 @@ export default function Home() {
     }
   };
 
+  const handleNextQuestion = () => {
+    setUserAnswer("");
+    setQuizResult(null);
+
+    if (dailyQuiz && currentQuestionIndex < dailyQuiz.questions.length - 1) {
+        setCurrentQuestionIndex(prev => prev + 1);
+        setQuizState('question');
+    } else if (dailyQuiz) {
+        const updatedQuiz = { ...dailyQuiz, completed: true };
+        setDailyQuiz(updatedQuiz);
+        localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
+        setQuizState('congratulations');
+    }
+  };
+  
+  const resetQuiz = () => {
+      localStorage.removeItem(QUIZ_STORAGE_KEY);
+      setDailyQuiz(null);
+      setCurrentQuestionIndex(0);
+      setQuizState('idle');
+      loadOrGenerateQuiz();
+  }
+  
+  const currentQuestion = dailyQuiz?.questions[currentQuestionIndex];
   const vsDateString = selectedPanchang ? `${selectedPanchang.masa}, ${selectedPanchang.samvat}` : "विक्रम संवत २०८१";
 
   if (initialLoad) {
     return <LoadingScreen />;
+  }
+
+  const renderQuizContent = () => {
+    switch (quizState) {
+        case 'loading':
+            return <p>प्रश्नोत्तरी लोड हो रही है...</p>;
+        
+        case 'question':
+        case 'evaluating':
+            return (
+                <>
+                  <p className="text-sm text-muted-foreground">प्रश्न {currentQuestionIndex + 1} / 10</p>
+                  <p className="font-semibold text-lg">{currentQuestion?.question}</p>
+                   <Textarea 
+                    placeholder="आपका उत्तर यहाँ लिखें..." 
+                    value={userAnswer}
+                    onChange={(e) => setUserAnswer(e.target.value)}
+                    rows={4}
+                  />
+                  <Button onClick={handleEvaluateAnswer} disabled={quizState === 'evaluating' || !userAnswer.trim()}>
+                    {quizState === 'evaluating' ? "जाँच हो रही है..." : "उत्तर दें"}
+                  </Button>
+                </>
+            );
+
+        case 'result':
+            return quizResult && (
+                 <div className="p-4 bg-muted/50 rounded-md border border-border/80 space-y-4">
+                    <div>
+                      <p className={`font-bold text-lg ${quizResult.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                        {quizResult.isCorrect ? "सही जवाब!" : "पुनः प्रयास करें"}
+                      </p>
+                      <p className="text-muted-foreground mt-1">{currentQuestion?.question}</p>
+                      <p className="font-semibold mt-1">आपका उत्तर: <span className="font-normal">{userAnswer}</span></p>
+                    </div>
+                   
+                    <div className="space-y-1">
+                      <p className="font-semibold">सारांश:</p>
+                      <p>{quizResult.summary}</p>
+                    </div>
+                    {quizResult.isCorrect ? (
+                        <Button onClick={handleNextQuestion} className="w-full">
+                            अगला प्रश्न
+                        </Button>
+                    ) : (
+                         <Button onClick={() => { setQuizState('question'); setUserAnswer(''); setQuizResult(null); }} variant="outline" className="w-full">
+                            फिर से प्रयास करें
+                        </Button>
+                    )}
+                 </div>
+            );
+            
+        case 'congratulations':
+            return (
+                <div className="flex flex-col items-center justify-center text-center h-full gap-4">
+                    <PartyPopper className="h-24 w-24 text-primary animate-bounce"/>
+                    <h2 className="text-2xl font-bold">बधाई हो!</h2>
+                    <p className="text-muted-foreground">आपने आज की प्रश्नोत्तरी पूरी कर ली है।</p>
+                    <Button onClick={() => setQuizState('finished')} className="w-full">आगे बढ़ें</Button>
+                </div>
+            );
+        
+        case 'finished':
+            return (
+                <div className="flex flex-col items-center justify-center text-center h-full gap-4">
+                    <h2 className="text-2xl font-bold">भाग लेने के लिए धन्यवाद!</h2>
+                    <p className="text-muted-foreground">नई प्रश्नोत्तरी के लिए कल फिर आएं।</p>
+                    <Button onClick={() => setIsQuizOpen(false)} className="w-full">
+                        <HomeIcon className="mr-2 h-4 w-4"/>
+                        होम पेज पर जाएं
+                    </Button>
+                </div>
+            )
+
+        default:
+             return (
+                <div className="flex flex-col items-center justify-center h-full gap-4">
+                    <p className="text-muted-foreground">कुछ गलत हो गया।</p>
+                    <Button onClick={resetQuiz}>
+                        <RefreshCw className="mr-2 h-4 w-4"/>
+                        पुनः आरंभ करें
+                    </Button>
+                </div>
+            );
+    }
   }
 
   return (
@@ -140,51 +293,8 @@ export default function Home() {
                           भारतीय संस्कृति और पंचांग के बारे में अपने ज्ञान का परीक्षण करें।
                         </SheetDescription>
                       </SheetHeader>
-                      <div className="grid gap-4 py-4 h-full">
-                        {quizState === 'loading' && <p>प्रश्न लोड हो रहा है...</p>}
-                        
-                        {quizState === 'question' || quizState === 'evaluating' ? (
-                          <>
-                            <p className="font-semibold text-lg">{currentQuestion?.question}</p>
-                             <Textarea 
-                              placeholder="आपका उत्तर यहाँ लिखें..." 
-                              value={userAnswer}
-                              onChange={(e) => setUserAnswer(e.target.value)}
-                              rows={4}
-                            />
-                            <Button onClick={handleEvaluateAnswer} disabled={quizState === 'evaluating' || !userAnswer.trim()}>
-                              {quizState === 'evaluating' ? "जाँच हो रही है..." : "उत्तर दें"}
-                            </Button>
-                          </>
-                        ) : null}
-
-                        {quizState === 'result' && quizResult && (
-                           <div className="p-4 bg-muted/50 rounded-md border border-border/80 space-y-4">
-                              <div>
-                                <p className={`font-bold text-lg ${quizResult.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                                  {quizResult.isCorrect ? "सही जवाब!" : "पुनः प्रयास करें"}
-                                </p>
-                                <p className="text-muted-foreground mt-1">{currentQuestion?.question}</p>
-                                <p className="font-semibold mt-1">आपका उत्तर: <span className="font-normal">{userAnswer}</span></p>
-                              </div>
-                             
-                              <div className="space-y-1">
-                                <p className="font-semibold">सारांश:</p>
-                                <p>{quizResult.summary}</p>
-                              </div>
-                              <Button onClick={handleGenerateQuestion} variant="outline" className="w-full">
-                                  <RefreshCw className="mr-2 h-4 w-4"/>
-                                  अगला प्रश्न
-                              </Button>
-                           </div>
-                        )}
-                        
-                        {(quizState === 'question' || quizState === 'result') && (
-                            <Button onClick={handleGenerateQuestion} variant="ghost" size="sm" className="mt-auto">
-                                <RefreshCw className="mr-2 h-4 w-4"/>
-                                दूसरा प्रश्न पूछें
-                            </Button>
-                        )}
+                      <div className="grid gap-4 py-4 h-[calc(100%-80px)]">
+                        {renderQuizContent()}
                       </div>
                     </SheetContent>
                   </Sheet>
