@@ -61,6 +61,7 @@ const generateQuestionPrompt = ai.definePrompt({
   prompt: `You are an expert on Indian culture, traditions, and the Hindu Panchang. 
   Generate 10 unique, interesting, and engaging quiz questions in Hindi. 
   The questions should be suitable for a general audience.
+  Ensure that each time you are called, you generate a completely new and different set of questions. Do not repeat questions from previous requests.
   Provide both the question and the correct answer for each.`,
 });
 
