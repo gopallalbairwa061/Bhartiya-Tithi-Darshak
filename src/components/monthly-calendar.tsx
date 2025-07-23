@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Moon, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Moon, Star, Sun, Sunset, Link as LinkIcon, CalendarDays } from "lucide-react";
 import { format, getDay, getYear, getMonth } from "date-fns";
 import { hi } from "date-fns/locale";
 import { DayProps, DayPicker } from "react-day-picker";
@@ -126,7 +126,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
             dayPanchang && (
             <div className="flex-grow text-[10px] text-muted-foreground leading-tight text-center">
               <p className="truncate">{dayPanchang.tithi.split(', ')[1]}</p>
-              <p className="truncate">{dayPanchang.nakshatra}</p>
+              <p className="truncate">{dayPanchang.nakshatra.name}</p>
             </div>
           )
         )}
@@ -141,6 +141,20 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     );
   };
   
+  const renderPanchangDetail = (icon: React.ReactNode, label: string, value?: string) => {
+    if (isLoading) return <div className="flex items-start gap-3"><Skeleton className="h-6 w-6 rounded-full" /><div className="space-y-1.5"><Skeleton className="h-4 w-16" /><Skeleton className="h-3 w-32" /></div></div>;
+    if (!value) return null;
+    return (
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 text-primary">{icon}</div>
+        <div>
+          <p className="font-semibold text-sm leading-tight">{label}</p>
+          <p className="text-muted-foreground text-xs">{value}</p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center p-2 rounded-md bg-background/50">
@@ -196,23 +210,24 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
             Day: DayWithDetails
         }}
         footer={
-            <div className="p-3 border-t text-sm space-y-2">
-                <div className="space-y-1">
-                    <strong className="font-semibold">{format(date, "d MMMM, yyyy", { locale: hi })}</strong> 
-                    {isLoading ? <Skeleton className="h-4 w-48 mt-1" /> : (
-                        selectedDayPanchang && (
-                        <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
-                            <span className="flex items-center gap-1.5"><Moon size={14} className="text-primary"/> {selectedDayPanchang.tithi}</span>
-                            <span className="flex items-center gap-1.5"><Star size={14} className="text-primary"/> {selectedDayPanchang.nakshatra}</span>
-                        </div>
-                    ))}
-                </div>
-                <Separator/>
-                <div>
-                  <strong className="font-semibold">त्योहार:</strong> 
-                  <p className="text-muted-foreground">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
-                </div>
+          <div className="p-4 border-t space-y-4">
+            <div>
+              <strong className="font-semibold text-base">{format(date, "d MMMM, yyyy", { locale: hi })}</strong>
+              <Separator className="my-2" />
+              <div className="space-y-1">
+                <strong className="font-semibold text-sm">त्योहार:</strong> 
+                <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
+              </div>
             </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {renderPanchangDetail(<Moon size={20} />, "तिथि", selectedDayPanchang?.tithi)}
+              {renderPanchangDetail(<Star size={20} />, "नक्षत्र", selectedDayPanchang ? `${selectedDayPanchang.nakshatra.name} ${selectedDayPanchang.nakshatra.endTime}`: undefined)}
+              {renderPanchangDetail(<LinkIcon size={20} />, "योग", selectedDayPanchang ? `${selectedDayPanchang.yoga.name} ${selectedDayPanchang.yoga.endTime}`: undefined)}
+              {renderPanchangDetail(<CalendarDays size={20} />, "करण", selectedDayPanchang ? `${selectedDayPanchang.karana.name} ${selectedDayPanchang.karana.endTime}`: undefined)}
+              {renderPanchangDetail(<Sun size={20} />, "सूर्योदय", selectedDayPanchang?.sunrise)}
+              {renderPanchangDetail(<Sunset size={20} />, "सूर्यास्त", selectedDayPanchang?.sunset)}
+            </div>
+          </div>
         }
       />
     </div>
