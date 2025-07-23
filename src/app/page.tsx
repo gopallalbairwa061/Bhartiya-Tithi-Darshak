@@ -213,14 +213,15 @@ export default function Home() {
 
    const handleWinnerFormSubmit = async (data: WinnerDetails) => {
     console.log("Winner details:", data);
-    await handleQuizWinner(data);
+    const result = await handleQuizWinner(data);
 
-    if (dailyQuiz) {
+    if (result.success && dailyQuiz) {
         const updatedQuiz = { ...dailyQuiz, submittedDetails: true };
         setDailyQuiz(updatedQuiz);
         localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
+        setQuizState('finished');
     }
-    setQuizState('finished');
+    return result;
   };
   
   const resetQuiz = () => {

@@ -19,7 +19,7 @@ const WinnerDetailsSchema = z.object({
 export type WinnerDetails = z.infer<typeof WinnerDetailsSchema>;
 
 interface WinnerDetailsFormProps {
-  onSubmit: (data: WinnerDetails) => Promise<void>;
+  onSubmit: (data: WinnerDetails) => Promise<{ success: boolean; message: string }>;
 }
 
 export function WinnerDetailsForm({ onSubmit }: WinnerDetailsFormProps) {
@@ -37,14 +37,22 @@ export function WinnerDetailsForm({ onSubmit }: WinnerDetailsFormProps) {
 
   const handleFormSubmit = async (data: WinnerDetails) => {
     try {
-      await onSubmit(data);
-      toast({
-        title: "सफलतापूर्वक सबमिट किया गया!",
-        description: "आपका विवरण हमें मिल गया है। हम जल्द ही आपसे संपर्क करेंगे।",
-      });
+      const result = await onSubmit(data);
+      if (result.success) {
+        toast({
+            title: "सफलतापूर्वक सबमिट किया गया!",
+            description: "आपका विवरण हमें मिल गया है। हम जल्द ही आपसे संपर्क करेंगे।",
+        });
+      } else {
+        toast({
+            title: "एक त्रुटि हुई",
+            description: result.message || "आपका विवरण सबमिट करने में विफल रहा। कृपया पुनः प्रयास करें।",
+            variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
-        title: "एक त्रुटि हुई",
+        title: "एक अप्रत्याशित त्रुटि हुई",
         description: "आपका विवरण सबमिट करने में विफल रहा। कृपया पुनः प्रयास करें।",
         variant: "destructive",
       });
@@ -107,5 +115,3 @@ export function WinnerDetailsForm({ onSubmit }: WinnerDetailsFormProps) {
     </div>
   );
 }
-
-    
