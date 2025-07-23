@@ -2,9 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer from 'nodemailer';
 
 const WinnerDetailsSchema = z.object({
   name: z.string().min(2, 'कम से कम 2 अक्षर का नाम आवश्यक है।'),
@@ -23,10 +21,21 @@ export async function handleQuizWinner(details: WinnerDetails): Promise<{ succes
     }
 
     const { name, email, upiId } = validation.data;
+    
+    // Create a transporter object using the default SMTP transport
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: Number(process.env.SMTP_PORT) === 465, // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+    });
 
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: 'myselfmk061@gmail.com',
+    await transporter.sendMail({
+      from: `"भारतीय तिथि दर्शक" <${process.env.SMTP_USER}>`, // sender address
+      to: 'myselfmk061@gmail.com', // list of receivers
       subject: `🎉 भारतीय तिथि दर्शक पर नए प्रश्नोत्तरी विजेता! (New Quiz Winner!)`,
       html: `
         <!DOCTYPE html>
@@ -74,16 +83,23 @@ export async function handleQuizWinner(details: WinnerDetails): Promise<{ succes
       `
     });
 
-    console.log("---------- NEW QUIZ WINNER (Email Sent) ----------");
+    console.log("---------- NEW QUIZ WINNER (Email Sent via SMTP) ----------");
     console.log("Name:   ", name);
     console.log("Email:  ", email);
     console.log("UPI ID: ", upiId);
-    console.log("-------------------------------------------------");
+    console.log("---------------------------------------------------------");
 
     return { success: true, message: "विवरण सफलतापूर्वक भेजा गया।" };
 
   } catch (error) {
-    console.error("Error handling quiz winner:", error);
-    return { success: false, message: "विवरण भेजने में विफल।" };
+    console.error("Error handling quiz winner via SMTP:", error);
+    // Check for specific SMTP errors if needed
+    if (error instanceof Error && 'code' in error) {
+        const smtpError = error as { code: string, message: string };
+        if (smtpError.code === 'EAUTH') {
+            return { success: false, message: "SMTP प्रमाणीकरण विफल। कृपया अपनी क्रेडेन्शियल जांचें।" };
+        }
+    }
+    return { success: false, message: "ईमेल भेजने में विफल। कृपया अपनी SMTP सेटिंग्स जांचें।" };
   }
 }
