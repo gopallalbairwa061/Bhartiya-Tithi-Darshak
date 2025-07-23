@@ -18,6 +18,8 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
 import { generateQuestions, evaluateAnswer, QuizQuestion } from "@/ai/flows/panchang-quiz-flow";
+import { WinnerDetailsForm, WinnerDetails } from "@/components/winner-details-form";
+import { handleQuizWinner } from "@/services/quiz-winner";
 
 const QUIZ_STORAGE_KEY = 'dailyQuiz';
 
@@ -26,6 +28,7 @@ type DailyQuiz = {
   questions: QuizQuestion[];
   answers: (null | { userAnswer: string; isCorrect: boolean })[];
   completed: boolean;
+  submittedDetails: boolean;
 };
 
 
@@ -37,7 +40,7 @@ export default function Home() {
   const [initialLoad, setInitialLoad] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   
-  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'finished'>('idle');
+  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'collect-details' | 'finished'>('idle');
   const [dailyQuiz, setDailyQuiz] = useState<DailyQuiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -99,8 +102,10 @@ export default function Home() {
             setDailyQuiz(parsedQuiz);
             const firstUnanswered = parsedQuiz.answers.findIndex(a => a === null);
             setCurrentQuestionIndex(firstUnanswered === -1 ? 0 : firstUnanswered);
-            if (parsedQuiz.completed) {
+             if (parsedQuiz.completed && parsedQuiz.submittedDetails) {
                 setQuizState('finished');
+            } else if (parsedQuiz.completed) {
+                setQuizState('collect-details');
             } else {
                 setQuizState('question');
             }
@@ -115,6 +120,7 @@ export default function Home() {
             questions,
             answers: Array(10).fill(null),
             completed: false,
+            submittedDetails: false,
         };
         localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(newQuiz));
         setDailyQuiz(newQuiz);
@@ -163,8 +169,26 @@ export default function Home() {
         const updatedQuiz = { ...dailyQuiz, completed: true };
         setDailyQuiz(updatedQuiz);
         localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
-        setQuizState('congratulations');
+        
+        const allCorrect = updatedQuiz.answers.every(a => a?.isCorrect);
+        if(allCorrect) {
+            setQuizState('congratulations');
+        } else {
+            setQuizState('finished');
+        }
     }
+  };
+
+   const handleWinnerFormSubmit = async (data: WinnerDetails) => {
+    console.log("Winner details:", data);
+    await handleQuizWinner(data);
+
+    if (dailyQuiz) {
+        const updatedQuiz = { ...dailyQuiz, submittedDetails: true };
+        setDailyQuiz(updatedQuiz);
+        localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
+    }
+    setQuizState('finished');
   };
   
   const resetQuiz = () => {
@@ -185,24 +209,25 @@ export default function Home() {
   const renderQuizContent = () => {
     switch (quizState) {
         case 'loading':
-            return <p>प्रश्नोत्तरी लोड हो रही है...</p>;
+            return <div className="flex justify-center items-center h-full"><p>प्रश्नोत्तरी लोड हो रही है...</p></div>;
         
         case 'question':
         case 'evaluating':
             return (
-                <>
-                  <p className="text-sm text-muted-foreground">प्रश्न {currentQuestionIndex + 1} / 10</p>
+                <div className="flex flex-col gap-4">
+                  <p className="text-sm text-muted-foreground text-center">प्रश्न {currentQuestionIndex + 1} / 10</p>
                   <p className="font-semibold text-lg">{currentQuestion?.question}</p>
                    <Textarea 
                     placeholder="आपका उत्तर यहाँ लिखें..." 
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     rows={4}
+                    disabled={quizState === 'evaluating'}
                   />
                   <Button onClick={handleEvaluateAnswer} disabled={quizState === 'evaluating' || !userAnswer.trim()}>
                     {quizState === 'evaluating' ? "जाँच हो रही है..." : "उत्तर दें"}
                   </Button>
-                </>
+                </div>
             );
 
         case 'result':
@@ -222,7 +247,7 @@ export default function Home() {
                     </div>
                     {quizResult.isCorrect ? (
                         <Button onClick={handleNextQuestion} className="w-full">
-                            अगला प्रश्न
+                            {currentQuestionIndex === 9 ? 'परिणाम देखें' : 'अगला प्रश्न'}
                         </Button>
                     ) : (
                          <Button onClick={() => { setQuizState('question'); setUserAnswer(''); setQuizResult(null); }} variant="outline" className="w-full">
@@ -237,16 +262,25 @@ export default function Home() {
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
                     <PartyPopper className="h-24 w-24 text-primary animate-bounce"/>
                     <h2 className="text-2xl font-bold">बधाई हो!</h2>
-                    <p className="text-muted-foreground">आपने आज की प्रश्नोत्तरी पूरी कर ली है।</p>
-                    <Button onClick={() => setQuizState('finished')} className="w-full">आगे बढ़ें</Button>
+                    <p className="text-muted-foreground">आपने आज की प्रश्नोत्तरी पूरी कर ली है और सभी उत्तर सही हैं!</p>
+                    <Button onClick={() => setQuizState('collect-details')} className="w-full">पुरस्कार का दावा करें</Button>
                 </div>
             );
         
+         case 'collect-details':
+            return <WinnerDetailsForm onSubmit={handleWinnerFormSubmit} />;
+
         case 'finished':
+            const allCorrect = dailyQuiz?.answers.every(a => a?.isCorrect);
+            const message = dailyQuiz?.submittedDetails 
+                ? "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।"
+                : allCorrect === false 
+                ? "आज के लिए बस इतना ही! बेहतर भाग्य अगली बार।"
+                : "नई प्रश्नोत्तरी के लिए कल फिर आएं।";
             return (
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
                     <h2 className="text-2xl font-bold">भाग लेने के लिए धन्यवाद!</h2>
-                    <p className="text-muted-foreground">नई प्रश्नोत्तरी के लिए कल फिर आएं।</p>
+                    <p className="text-muted-foreground">{message}</p>
                     <Button onClick={() => setIsQuizOpen(false)} className="w-full">
                         <HomeIcon className="mr-2 h-4 w-4"/>
                         होम पेज पर जाएं
@@ -293,7 +327,7 @@ export default function Home() {
                           भारतीय संस्कृति और पंचांग के बारे में अपने ज्ञान का परीक्षण करें।
                         </SheetDescription>
                       </SheetHeader>
-                      <div className="grid gap-4 py-4 h-[calc(100%-80px)]">
+                      <div className="py-4 h-[calc(100%-80px)]">
                         {renderQuizContent()}
                       </div>
                     </SheetContent>
@@ -329,3 +363,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
