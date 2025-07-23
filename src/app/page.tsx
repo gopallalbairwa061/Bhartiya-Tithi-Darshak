@@ -7,12 +7,15 @@ import { SunTimesCard } from "@/components/sun-times-card";
 import { ChaughadiyaCard } from "@/components/chaughadiya-card";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { format, getYear, getMonth } from "date-fns";
+import { LoadingScreen } from "@/components/loading-screen";
+import { LogoIcon } from "@/components/icons/logo-icon";
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedPanchang, setSelectedPanchang] = useState<PanchangData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -44,18 +47,25 @@ export default function Home() {
         setSelectedPanchang(null);
       } finally {
         setIsLoading(false);
+        if (initialLoad) {
+          setTimeout(() => setInitialLoad(false), 1000); // Simulate loading time
+        }
       }
     };
     fetchPanchang();
-  }, [selectedDate]);
-
+  }, [selectedDate, initialLoad]);
 
   const vsDateString = selectedPanchang ? `${selectedPanchang.masa}, ${selectedPanchang.samvat}` : "विक्रम संवत २०८१";
+
+  if (initialLoad) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
       <main className="flex-grow container mx-auto px-4 py-8">
-        <header className="text-center mb-12">
+        <header className="text-center mb-12 flex flex-col items-center">
+            <LogoIcon className="h-16 w-16 mb-4" />
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-accent tracking-tight">
             भारतीय तिथि दर्शक
           </h1>
