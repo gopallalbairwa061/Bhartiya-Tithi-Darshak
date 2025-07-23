@@ -9,17 +9,49 @@ import { DiyaIcon } from "@/components/icons/diya-icon";
 
 const festivals = [
     { name: "दिवाली", date: "नवंबर 1, 2024", icon: "diya" },
-    { name: "होली", date: "मार्च 25, 2025", icon: "calendar" },
+    { name: "होली", date: "मार्च 14, 2025", icon: "calendar" },
     { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2024", icon: "calendar" },
     { name: "जन्माष्टमी", date: "अगस्त 26, 2024", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 7, 2024", icon: "calendar" },
     { name: "नवरात्रि", date: "अक्टूबर 3, 2024", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 12, 2024", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 19, 2024", icon: "calendar" },
+    // 2025 Festivals
     { name: "मकर संक्रांति", date: "जनवरी 14, 2025", icon: "calendar" },
     { name: "गणतंत्र दिवस", date: "जनवरी 26, 2025", icon: "calendar" },
+    { name: "वसंत पंचमी", date: "फरवरी 3, 2025", icon: "calendar" },
     { name: "महा शिवरात्रि", date: "फरवरी 26, 2025", icon: "calendar" },
-    { name: "रक्षा बंधन", date: "अगस्त 19, 2024", icon: "calendar" },
+    { name: "होलिका दहन", date: "मार्च 13, 2025", icon: "calendar" },
+    { name: "गुड़ी पड़वा", date: "मार्च 30, 2025", icon: "calendar" },
+    { name: "राम नवमी", date: "अप्रैल 6, 2025", icon: "calendar" },
+    { name: "हनुमान जयंती", date: "अप्रैल 20, 2025", icon: "calendar" },
+    { name: "अक्षय तृतीया", date: "अप्रैल 30, 2025", icon: "calendar" },
+    { name: "बुद्ध पूर्णिमा", date: "मई 12, 2025", icon: "calendar" },
+    { name: "वट सावित्री व्रत", date: "मई 26, 2025", icon: "calendar" },
+    { name: "जगन्नाथ रथ यात्रा", date: "जून 26, 2025", icon: "calendar" },
+    { name: "गुरु पूर्णिमा", date: "जुलाई 11, 2025", icon: "calendar" },
+    { name: "नाग पंचमी", date: "अगस्त 5, 2025", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2025", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 9, 2025", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 16, 2025", icon: "calendar" },
+    { name: "गणेश चतुर्थी", date: "अगस्त 28, 2025", icon: "calendar" },
+    { name: "ओणम", date: "सितंबर 7, 2025", icon: "calendar" },
+    { name: "अनंत चतुर्दशी", date: "सितंबर 7, 2025", icon: "calendar" },
+    { name: "नवरात्रि प्रारंभ", date: "सितंबर 22, 2025", icon: "calendar" },
+    { name: "गांधी जयंती", date: "अक्टूबर 2, 2025", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 1, 2025", icon: "calendar" },
+    { name: "शरद पूर्णिमा", date: "अक्टूबर 6, 2025", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 10, 2025", icon: "calendar" },
+    { name: "धनतेरस", date: "अक्टूबर 20, 2025", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 21, 2025", icon: "diya" },
+    { name: "गोवर्धन पूजा", date: "अक्टूबर 22, 2025", icon: "calendar" },
+    { name: "भाई दूज", date: "अक्टूबर 23, 2025", icon: "calendar" },
+    { name: "छठ पूजा", date: "अक्टूबर 27, 2025", icon: "calendar" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 2, 2025", icon: "calendar" },
+    { name: "गुरु नानक जयंती", date: "नवंबर 5, 2025", icon: "calendar" },
+    { name: "क्रिसमस", date: "दिसंबर 25, 2025", icon: "calendar" },
 ];
+
 
 export function FestivalSearch() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -55,11 +87,11 @@ export function FestivalSearch() {
         </div>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[430px] pr-4">
+        <ScrollArea className="h-[calc(100vh-28rem)] min-h-[400px] pr-4">
           <ul className="space-y-4">
             {filteredFestivals.length > 0 ? (
               filteredFestivals.map((festival) => (
-                <li key={festival.name} className="flex items-center gap-4 p-3 rounded-lg hover:bg-background/80 transition-colors duration-200 cursor-pointer">
+                <li key={`${festival.name}-${festival.date}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-background/80 transition-colors duration-200 cursor-pointer">
                   {getIcon(festival.icon)}
                   <div>
                     <p className="font-semibold text-lg">{festival.name}</p>

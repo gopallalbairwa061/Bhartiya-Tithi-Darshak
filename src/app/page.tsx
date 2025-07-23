@@ -4,19 +4,25 @@ import { useState, useEffect } from "react";
 import { PanchangCard } from "@/components/panchang-card";
 import { FestivalSearch } from "@/components/festival-search";
 import { SunTimesCard } from "@/components/sun-times-card";
+import { ChaughadiyaCard } from "@/components/chaughadiya-card";
 
 export default function Home() {
-  const [currentDate, setCurrentDate] = useState("");
+  const [currentDateTime, setCurrentDateTime] = useState("");
 
   useEffect(() => {
-    const today = new Date();
-    const dateString = today.toLocaleDateString('hi-IN', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    setCurrentDate(dateString);
+    const timer = setInterval(() => {
+      const today = new Date();
+      const dateString = today.toLocaleDateString('hi-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+      const timeString = today.toLocaleTimeString('hi-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      setCurrentDateTime(`${dateString} | ${timeString}`);
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const vsDateString = "विक्रम संवत २०८१";
@@ -29,7 +35,7 @@ export default function Home() {
             भारतीय तिथि दर्शक
           </h1>
           <p className="text-lg md:text-xl text-primary mt-2 animate-fade-in">
-            {currentDate ? `${currentDate} | ${vsDateString}` : <span className="inline-block h-6 w-64 bg-primary/20 rounded animate-pulse"></span>}
+            {currentDateTime ? `${currentDateTime} | ${vsDateString}` : <span className="inline-block h-6 w-96 bg-primary/20 rounded animate-pulse"></span>}
           </p>
         </header>
 
@@ -37,6 +43,8 @@ export default function Home() {
           <div className="xl:col-span-1 flex flex-col gap-8">
             <PanchangCard />
             <SunTimesCard />
+            <ChaughadiyaCard title="दिन का चौघड़िया" />
+            <ChaughadiyaCard title="रात का चौघड़िया" />
           </div>
           <div className="xl:col-span-2">
             <FestivalSearch />
