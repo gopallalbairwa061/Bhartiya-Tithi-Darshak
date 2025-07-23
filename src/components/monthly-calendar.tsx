@@ -6,9 +6,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Moon, Star, Sun, Sunset, Link as LinkIcon, CalendarDays } from "lucide-react";
-import { format, getYear, getMonth, set, getDay } from "date-fns";
+import { format, getYear, getMonth, set, getDay, eachDayOfInterval, startOfMonth, endOfMonth } from "date-fns";
 import { hi } from "date-fns/locale";
-import { DayProps } from "react-day-picker";
+import { DayProps, useDayPicker, useNavigation } from "react-day-picker";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -116,69 +116,58 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
   
   const selectedDayPanchang = panchangData.get(format(selectedDate, "yyyy-MM-dd"));
 
-  const DayWithDetails = (props: DayProps) => {
-    const dateStr = format(props.date, "yyyy-MM-dd");
+  const daysInMonth = eachDayOfInterval({
+    start: startOfMonth(currentMonth),
+    end: endOfMonth(currentMonth),
+  });
+
+  const DayWithDetails = ({ date }: { date: Date }) => {
+    const dateStr = format(date, "yyyy-MM-dd");
     const dayFestivals = festivalsByDate.get(dateStr);
     const dayPanchang = panchangData.get(dateStr);
-    const dayNumber = props.date.getDate();
-    const isSunday = getDay(props.date) === 0;
+    const dayNumber = date.getDate();
+    const isSunday = getDay(date) === 0;
+    const isSelected = format(date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
 
     return (
-      <div className="relative h-full w-full flex flex-col justify-between p-1.5 text-left">
-        {isLoading ? (
-            <div className="flex flex-col gap-1.5">
-                <Skeleton className="h-2.5 w-10/12" />
-                <Skeleton className="h-8 w-6 mx-auto" />
-                <Skeleton className="h-2 w-full" />
-                <Skeleton className="h-2 w-8/12" />
-            </div>
-        ) : dayPanchang && (
-            <>
-                <div className="text-[10px] text-muted-foreground leading-tight">
-                    <span>{dayPanchang.paksha === "शुक्ल पक्ष" ? 'शु' : 'कृ'} {dayPanchang.tithi.split(', ')[1].split(' ')[0]}</span>
-                    <span> / {dayPanchang.tithiNumber}</span>
-                </div>
-
-                <div className="flex-grow flex flex-col items-center justify-center">
-                    <span className="text-xs text-muted-foreground">{format(props.date, 'cccc', { locale: hi })}</span>
-                    <span className={cn("text-3xl lg:text-4xl font-bold", isSunday && "text-destructive")}>{dayNumber.toLocaleString('hi-IN')}</span>
-                     {dayFestivals && dayFestivals.map(f => (
-                        <span key={f.name} className="mt-1 text-[10px] font-semibold text-primary leading-tight tracking-tighter text-center">
-                           {f.name}
-                        </span>
-                    ))}
-                </div>
-
-                <div className="text-[10px] text-muted-foreground leading-tight text-center">
-                    <span>• {dayPanchang.rashi} {dayPanchang.nakshatra.endTime.split(' ')[1]}</span>
-                    <span className="font-sans"> ☆ </span>
-                    <span>{dayPanchang.nakshatra.name}</span>
-                </div>
-            </>
+       <div
+        onClick={() => setSelectedDate(date)}
+        className={cn(
+            "flex w-full border-b p-4 gap-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200",
+            isSelected && "bg-primary/20",
+            isSunday && !isSelected && "bg-destructive/5"
         )}
-      </div>
-    );
-  };
-  
-  const renderPanchangDetail = (icon: React.ReactNode, label: string, value?: string) => {
-    if (isLoading && !selectedDayPanchang) return <div className="flex items-start gap-3"><Skeleton className="h-6 w-6 rounded-full" /><div className="space-y-1.5"><Skeleton className="h-4 w-16" /><Skeleton className="h-3 w-32" /></div></div>;
-    if (!value) return null;
-    return (
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 text-primary">{icon}</div>
-        <div>
-          <p className="font-semibold text-sm leading-tight">{label}</p>
-          <p className="text-muted-foreground text-sm">{value}</p>
+      >
+        <div className="flex flex-col items-center justify-center w-24">
+            <span className={cn("text-5xl font-bold tracking-tighter", isSunday && "text-destructive")}>
+                {dayNumber.toLocaleString('hi-IN')}
+            </span>
+            <span className="text-sm font-medium text-muted-foreground -mt-1">{format(date, 'cccc', { locale: hi })}</span>
+        </div>
+
+        <div className="flex-grow space-y-1.5 text-sm">
+             {isLoading ? (
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-2/3" />
+                </div>
+            ) : dayPanchang ? (
+                <>
+                   <p><strong className="font-semibold">तिथि:</strong> {dayPanchang.tithi}</p>
+                   <p><strong className="font-semibold">नक्षत्र:</strong> {dayPanchang.nakshatra.name} ({dayPanchang.nakshatra.endTime})</p>
+                   {dayFestivals && dayFestivals.length > 0 && (
+                        <p className="font-bold text-primary">{dayFestivals.map(f => f.name).join(', ')}</p>
+                    )}
+                </>
+            ) : (
+                <p>कोई डेटा नहीं</p>
+            )}
         </div>
       </div>
     );
   };
-
-  const formatWeekdayName = (day: Date) => {
-    return format(day, 'E', { locale: hi });
-  };
-
-
+  
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
@@ -211,54 +200,12 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-      <Calendar
-        mode="single"
-        selected={selectedDate}
-        onSelect={(d) => d && setSelectedDate(d)}
-        month={currentMonth}
-        onMonthChange={setCurrentMonth}
-        locale={hi}
-        formatters={{ formatWeekdayName }}
-        className="rounded-md p-0"
-        classNames={{
-            months: "p-0",
-            month: "p-3 space-y-4",
-            caption: "hidden",
-            head_row: "grid grid-cols-7",
-            head_cell: "text-muted-foreground font-medium text-sm",
-            cell: "h-32 md:h-36 lg:h-40 text-center text-sm p-0 relative first:border-l",
-            row: "grid grid-cols-7 w-full border-r",
-            day: "h-full w-full p-0",
-            day_selected: "bg-primary/20 text-primary-foreground rounded-none ring-2 ring-primary",
-            day_today: "bg-accent/50 text-accent-foreground rounded-none",
-            day_outside: "text-muted-foreground/50 bg-background/50",
-        }}
-        components={{
-            Day: DayWithDetails
-        }}
-        footer={
-          <div className="p-4 border-t space-y-4">
-            <div>
-              <strong className="font-semibold text-lg">{format(selectedDate, "d MMMM, yyyy", { locale: hi })}</strong>
-              <Separator className="my-2" />
-              <div className="space-y-1">
-                <strong className="font-semibold text-sm">त्योहार:</strong> 
-                <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(selectedDate, "yyyy-MM-dd"))?.map(f => f.name).join(", ") || "कोई नहीं"}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-              {renderPanchangDetail(<Moon size={20} />, "तिथि", selectedDayPanchang?.tithi)}
-              {renderPanchangDetail(<Star size={20} />, "नक्षत्र", selectedDayPanchang ? `${selectedDayPanchang.nakshatra.name} ${selectedDayPanchang.nakshatra.endTime}`: undefined)}
-              {renderPanchangDetail(<LinkIcon size={20} />, "योग", selectedDayPanchang ? `${selectedDayPanchang.yoga.name} ${selectedDayPanchang.yoga.endTime}`: undefined)}
-              {renderPanchangDetail(<CalendarDays size={20} />, "करण", selectedDayPanchang ? `${selectedDayPanchang.karana.name} ${selectedDayPanchang.karana.endTime}`: undefined)}
-              {renderPanchangDetail(<Sun size={20} />, "सूर्योदय", selectedDayPanchang?.sunrise)}
-              {renderPanchangDetail(<Sunset size={20} />, "सूर्यास्त", selectedDayPanchang?.sunset)}
-            </div>
-          </div>
-        }
-      />
+      
+      <div className="border rounded-md max-h-[calc(100vh-32rem)] min-h-[400px] overflow-y-auto">
+        {daysInMonth.map((day) => (
+            <DayWithDetails key={day.toISOString()} date={day} />
+        ))}
+      </div>
     </div>
   );
 }
-
-    
