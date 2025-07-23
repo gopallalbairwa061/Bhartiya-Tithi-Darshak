@@ -448,9 +448,6 @@ export default function Home() {
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50">
         <div className="flex justify-center items-center gap-4">
             <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
-            <Link href="/about" className="text-primary hover:underline flex items-center gap-1">
-                <Info size={16} /> हमारे बारे में
-            </Link>
         </div>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
