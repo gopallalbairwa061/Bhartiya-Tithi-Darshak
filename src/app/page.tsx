@@ -78,12 +78,15 @@ export default function Home() {
           </p>
         </header>
 
+        <div className="max-w-md mx-auto w-full mb-8">
+            <PanchangDetailCard panchang={selectedPanchang} isLoading={isLoading} />
+        </div>
+
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
           <div className="xl:col-span-2">
             <FestivalSearch onDateSelect={setSelectedDate} />
           </div>
           <div className="xl:col-span-1 flex flex-col gap-8">
-            <PanchangDetailCard panchang={selectedPanchang} isLoading={isLoading} />
             <SunTimesCard panchang={selectedPanchang} isLoading={isLoading} />
             <ChaughadiyaCard title="दिन का चौघड़िया" />
             <ChaughadiyaCard title="रात का चौघड़िया" />
