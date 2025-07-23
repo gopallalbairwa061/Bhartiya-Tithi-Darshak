@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -65,11 +66,13 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
       <main className="flex-grow container mx-auto px-4 py-8 pb-32">
-        <header className="text-center mb-12 flex flex-col items-center">
-            <LogoIcon className="h-16 w-16 mb-4" />
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-accent tracking-tight">
-            भारतीय तिथि दर्शक
-          </h1>
+        <header className="text-center mb-12">
+            <div className="flex justify-center items-center gap-4 mb-4">
+                <LogoIcon className="h-16 w-16" />
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-accent tracking-tight">
+                    भारतीय तिथि दर्शक
+                </h1>
+            </div>
           <p className="text-lg md:text-xl text-primary mt-2 animate-fade-in">
             {currentDateTime ? `${currentDateTime} | ${vsDateString}` : <span className="inline-block h-6 w-96 bg-primary/20 rounded animate-pulse"></span>}
           </p>
