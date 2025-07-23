@@ -29,6 +29,7 @@ type DailyQuiz = {
   answers: (null | { userAnswer: string; isCorrect: boolean })[];
   completed: boolean;
   submittedDetails: boolean;
+  failed: boolean;
 };
 
 
@@ -100,6 +101,10 @@ export default function Home() {
         const parsedQuiz: DailyQuiz = JSON.parse(storedQuiz);
         if (parsedQuiz.date === todayStr) {
             setDailyQuiz(parsedQuiz);
+            if (parsedQuiz.failed) {
+                setQuizState('finished');
+                return;
+            }
             const firstUnanswered = parsedQuiz.answers.findIndex(a => a === null);
             setCurrentQuestionIndex(firstUnanswered === -1 ? 0 : firstUnanswered);
              if (parsedQuiz.completed && parsedQuiz.submittedDetails) {
@@ -121,6 +126,7 @@ export default function Home() {
             answers: Array(10).fill(null),
             completed: false,
             submittedDetails: false,
+            failed: false,
         };
         localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(newQuiz));
         setDailyQuiz(newQuiz);
@@ -146,12 +152,20 @@ export default function Home() {
 
       const newAnswers = [...dailyQuiz.answers];
       newAnswers[currentQuestionIndex] = { userAnswer, isCorrect: result.isCorrect };
-      const updatedQuiz = { ...dailyQuiz, answers: newAnswers };
+      let updatedQuiz = { ...dailyQuiz, answers: newAnswers };
+
+      if (!result.isCorrect) {
+          updatedQuiz.failed = true;
+          setQuizState('finished');
+      } else {
+          setQuizState('result');
+      }
+      
       setDailyQuiz(updatedQuiz);
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
 
       setQuizResult(result);
-      setQuizState('result');
+
     } catch (error) {
       console.error("Error evaluating answer:", error);
       setQuizState('question');
@@ -234,8 +248,8 @@ export default function Home() {
             return quizResult && (
                  <div className="p-4 bg-muted/50 rounded-md border border-border/80 space-y-4">
                     <div>
-                      <p className={`font-bold text-lg ${quizResult.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                        {quizResult.isCorrect ? "सही जवाब!" : "पुनः प्रयास करें"}
+                      <p className={`font-bold text-lg text-green-600`}>
+                        सही जवाब!
                       </p>
                       <p className="text-muted-foreground mt-1">{currentQuestion?.question}</p>
                       <p className="font-semibold mt-1">आपका उत्तर: <span className="font-normal">{userAnswer}</span></p>
@@ -245,15 +259,9 @@ export default function Home() {
                       <p className="font-semibold">सारांश:</p>
                       <p>{quizResult.summary}</p>
                     </div>
-                    {quizResult.isCorrect ? (
-                        <Button onClick={handleNextQuestion} className="w-full">
-                            {currentQuestionIndex === 9 ? 'परिणाम देखें' : 'अगला प्रश्न'}
-                        </Button>
-                    ) : (
-                         <Button onClick={() => { setQuizState('question'); setUserAnswer(''); setQuizResult(null); }} variant="outline" className="w-full">
-                            फिर से प्रयास करें
-                        </Button>
-                    )}
+                    <Button onClick={handleNextQuestion} className="w-full">
+                        {currentQuestionIndex === 9 ? 'परिणाम देखें' : 'अगला प्रश्न'}
+                    </Button>
                  </div>
             );
             
@@ -271,11 +279,10 @@ export default function Home() {
             return <WinnerDetailsForm onSubmit={handleWinnerFormSubmit} />;
 
         case 'finished':
-            const allCorrect = dailyQuiz?.answers.every(a => a?.isCorrect);
-            const message = dailyQuiz?.submittedDetails 
+            const message = dailyQuiz?.failed
+                ? "आपका जवाब गलत है। बेहतर भाग्य अगली बार!"
+                : dailyQuiz?.submittedDetails 
                 ? "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।"
-                : allCorrect === false 
-                ? "आज के लिए बस इतना ही! बेहतर भाग्य अगली बार।"
                 : "नई प्रश्नोत्तरी के लिए कल फिर आएं।";
             return (
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
@@ -363,5 +370,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
