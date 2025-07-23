@@ -13,7 +13,7 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
@@ -121,8 +121,6 @@ export default function Home() {
             if (parsedQuiz.completed) {
                 if (parsedQuiz.failed) {
                     setQuizState('finished');
-                } else if (parsedQuiz.submittedDetails) {
-                    setQuizState('finished');
                 } else {
                     setQuizState('congratulations');
                 }
@@ -174,15 +172,17 @@ export default function Home() {
 
       if (!result.isCorrect) {
           updatedQuiz.failed = true;
+          updatedQuiz.completed = true; // Mark as completed even on failure
+          setDailyQuiz(updatedQuiz);
+          localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
           setQuizState('finished');
       } else {
+          setQuizResult(result);
+          setDailyQuiz(updatedQuiz);
+          localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
           setQuizState('result');
       }
       
-      setQuizResult(result);
-      setDailyQuiz(updatedQuiz);
-      localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
-
     } catch (error) {
       console.error("Error evaluating answer:", error);
       setQuizState('question');
@@ -290,7 +290,18 @@ export default function Home() {
                     <PartyPopper className="h-24 w-24 text-primary animate-bounce"/>
                     <h2 className="text-2xl font-bold">बधाई हो!</h2>
                     <p className="text-muted-foreground">आपने आज की प्रश्नोत्तरी पूरी कर ली है और सभी उत्तर सही हैं!</p>
-                    <Button onClick={() => setQuizState('collect-details')} className="w-full">पुरस्कार का दावा करें</Button>
+                    {dailyQuiz?.submittedDetails ? (
+                       <div className="p-4 bg-green-100/50 dark:bg-green-900/30 rounded-md text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800 w-full flex items-center justify-center gap-2">
+                           <CheckCircle className="h-5 w-5"/>
+                           <p>आप आज के लिए अपना पुरस्कार का दावा कर चुके हैं!</p>
+                       </div>
+                    ) : (
+                       <Button onClick={() => setQuizState('collect-details')} className="w-full">पुरस्कार का दावा करें</Button>
+                    )}
+                     <Button onClick={resetQuiz} variant="outline" className="w-full">
+                        <RefreshCw className="mr-2 h-4 w-4"/>
+                        {"पुनः प्रश्नोत्तरी खेलें"}
+                    </Button>
                 </div>
             );
         
