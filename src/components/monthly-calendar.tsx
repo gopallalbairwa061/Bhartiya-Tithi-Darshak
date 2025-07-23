@@ -6,7 +6,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Moon, Star, Sun, Sunset, Link as LinkIcon, CalendarDays } from "lucide-react";
-import { format, getYear, getMonth } from "date-fns";
+import { format, getYear, getMonth, set } from "date-fns";
 import { hi } from "date-fns/locale";
 import { DayProps } from "react-day-picker";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
@@ -22,6 +22,7 @@ type Festival = {
 
 interface MonthlyCalendarProps {
   festivals: Festival[];
+  onDateSelect: (date: Date) => void;
 }
 
 const monthMap: { [key: string]: number } = {
@@ -49,16 +50,17 @@ const parseHindiDate = (dateString: string): Date | null => {
 };
 
 
-export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
-  const [date, setDate] = useState<Date>(new Date());
+export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProps) {
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [panchangData, setPanchangData] = useState<Map<string, PanchangData>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchPanchangData = async () => {
       setIsLoading(true);
-      const year = getYear(date);
-      const month = getMonth(date);
+      const year = getYear(currentMonth);
+      const month = getMonth(currentMonth);
       try {
         const data = await getPanchangForMonth(year, month);
         const map = new Map<string, PanchangData>();
@@ -71,7 +73,12 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
       }
     };
     fetchPanchangData();
-  }, [date]);
+  }, [currentMonth]);
+
+  useEffect(() => {
+    onDateSelect(selectedDate);
+  }, [selectedDate, onDateSelect]);
+
 
   const festivalsByDate = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -88,25 +95,25 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     return map;
   }, [festivals]);
 
-  const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i); // e.g. 2022 to 2026
+  const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i);
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: i,
     label: format(new Date(2000, i), "LLLL", { locale: hi }),
   }));
 
   const handleYearChange = (year: string) => {
-    const newDate = new Date(date);
+    const newDate = new Date(currentMonth);
     newDate.setFullYear(parseInt(year, 10));
-    setDate(newDate);
+    setCurrentMonth(newDate);
   };
 
   const handleMonthChange = (month: string) => {
-    const newDate = new Date(date);
+    const newDate = new Date(currentMonth);
     newDate.setMonth(parseInt(month, 10));
-    setDate(newDate);
+    setCurrentMonth(newDate);
   };
   
-  const selectedDayPanchang = panchangData.get(format(date, "yyyy-MM-dd"));
+  const selectedDayPanchang = panchangData.get(format(selectedDate, "yyyy-MM-dd"));
 
   const DayWithDetails = (props: DayProps) => {
     const dateStr = format(props.date, "yyyy-MM-dd");
@@ -142,7 +149,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
   };
   
   const renderPanchangDetail = (icon: React.ReactNode, label: string, value?: string) => {
-    if (isLoading) return <div className="flex items-start gap-3"><Skeleton className="h-6 w-6 rounded-full" /><div className="space-y-1.5"><Skeleton className="h-4 w-16" /><Skeleton className="h-3 w-32" /></div></div>;
+    if (isLoading && !selectedDayPanchang) return <div className="flex items-start gap-3"><Skeleton className="h-6 w-6 rounded-full" /><div className="space-y-1.5"><Skeleton className="h-4 w-16" /><Skeleton className="h-3 w-32" /></div></div>;
     if (!value) return null;
     return (
       <div className="flex items-start gap-3">
@@ -158,11 +165,11 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center p-2 rounded-md bg-background/50">
-        <Button variant="outline" size="icon" onClick={() => setDate(d => new Date(d.setMonth(d.getMonth() - 1)))}>
+        <Button variant="outline" size="icon" onClick={() => setCurrentMonth(d => new Date(d.setMonth(d.getMonth() - 1)))}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-center gap-2">
-            <Select value={date.getMonth().toString()} onValueChange={handleMonthChange}>
+            <Select value={currentMonth.getMonth().toString()} onValueChange={handleMonthChange}>
                 <SelectTrigger className="w-[120px] font-semibold text-base">
                     <SelectValue placeholder="माह" />
                 </SelectTrigger>
@@ -172,7 +179,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
                     ))}
                 </SelectContent>
             </Select>
-            <Select value={date.getFullYear().toString()} onValueChange={handleYearChange}>
+            <Select value={currentMonth.getFullYear().toString()} onValueChange={handleYearChange}>
                 <SelectTrigger className="w-[100px] font-semibold text-base">
                     <SelectValue placeholder="वर्ष" />
                 </SelectTrigger>
@@ -183,16 +190,16 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
                 </SelectContent>
             </Select>
         </div>
-        <Button variant="outline" size="icon" onClick={() => setDate(d => new Date(d.setMonth(d.getMonth() + 1)))}>
+        <Button variant="outline" size="icon" onClick={() => setCurrentMonth(d => new Date(d.setMonth(d.getMonth() + 1)))}>
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
       <Calendar
         mode="single"
-        selected={date}
-        onSelect={(d) => d && setDate(d)}
-        month={date}
-        onMonthChange={setDate}
+        selected={selectedDate}
+        onSelect={(d) => d && setSelectedDate(d)}
+        month={currentMonth}
+        onMonthChange={setCurrentMonth}
         locale={hi}
         className="rounded-md border p-0"
         classNames={{
@@ -212,11 +219,11 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
         footer={
           <div className="p-4 border-t space-y-4">
             <div>
-              <strong className="font-semibold text-lg">{format(date, "d MMMM, yyyy", { locale: hi })}</strong>
+              <strong className="font-semibold text-lg">{format(selectedDate, "d MMMM, yyyy", { locale: hi })}</strong>
               <Separator className="my-2" />
               <div className="space-y-1">
                 <strong className="font-semibold text-sm">त्योहार:</strong> 
-                <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
+                <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(selectedDate, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-4">

@@ -60,8 +60,11 @@ const festivals = [
     { name: "क्रिसमस", date: "दिसंबर 25, 2025", icon: "calendar" },
 ];
 
+interface FestivalSearchProps {
+  onDateSelect: (date: Date) => void;
+}
 
-export function FestivalSearch() {
+export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredFestivals = useMemo(() => {
@@ -90,7 +93,7 @@ export function FestivalSearch() {
             <TabsTrigger value="search">त्योहार खोजें</TabsTrigger>
           </TabsList>
           <TabsContent value="calendar" className="mt-4">
-            <MonthlyCalendar festivals={festivals} />
+            <MonthlyCalendar festivals={festivals} onDateSelect={onDateSelect} />
           </TabsContent>
           <TabsContent value="search" className="mt-4">
             <div className="relative">
