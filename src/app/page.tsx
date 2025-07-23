@@ -13,7 +13,7 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle2, XCircle, ChevronRight } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
@@ -44,7 +44,7 @@ export default function Home() {
   const [initialLoad, setInitialLoad] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   
-  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'review' | 'congratulations' | 'collect-details' | 'finished'>('idle');
+  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'collect-details' | 'finished'>('idle');
   const [dailyQuiz, setDailyQuiz] = useState<DailyQuiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -118,12 +118,16 @@ export default function Home() {
             const firstUnanswered = parsedQuiz.answers.findIndex(a => a === null);
             setCurrentQuestionIndex(firstUnanswered === -1 ? 0 : firstUnanswered);
 
-            if (parsedQuiz.completed && !parsedQuiz.failed) {
-                 setQuizState('review');
+            if (parsedQuiz.completed) {
+                if (parsedQuiz.failed) {
+                    setQuizState('finished');
+                } else if (parsedQuiz.submittedDetails) {
+                    setQuizState('finished');
+                } else {
+                    setQuizState('congratulations');
+                }
             } else if (parsedQuiz.failed) {
                 setQuizState('finished');
-            } else if (parsedQuiz.completed) {
-                setQuizState('review');
             }
             else {
                 setQuizState('question');
@@ -196,27 +200,16 @@ export default function Home() {
         const updatedQuiz = { ...dailyQuiz, completed: true };
         setDailyQuiz(updatedQuiz);
         localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
-        setQuizState('review');
+        
+        const allCorrect = updatedQuiz.answers.every(a => a?.result.isCorrect);
+        if (allCorrect) {
+          setQuizState('congratulations');
+        } else {
+          setQuizState('finished');
+        }
     }
   };
   
-  const handleProceedFromReview = () => {
-    if (!dailyQuiz) return;
-
-    if (dailyQuiz.submittedDetails) {
-        setQuizState('finished');
-        return;
-    }
-
-    const allCorrect = dailyQuiz.answers.every(a => a?.result.isCorrect);
-    if(allCorrect) {
-        setQuizState('congratulations');
-    } else {
-        // This case should ideally not be reached if failed state is set correctly
-        setQuizState('finished');
-    }
-  }
-
 
    const handleWinnerFormSubmit = async (data: WinnerDetails) => {
     console.log("Winner details:", data);
@@ -289,48 +282,6 @@ export default function Home() {
                     </Button>
                  </div>
             );
-
-        case 'review':
-          return (
-            <div className="flex flex-col gap-4 h-full">
-              <h2 className="text-xl font-bold text-center">क्विज़ की समीक्षा</h2>
-              <p className="text-sm text-muted-foreground text-center">यहाँ आपके उत्तरों का सारांश है।</p>
-              <ScrollArea className="flex-grow pr-4">
-                <Accordion type="single" collapsible className="w-full">
-                  {dailyQuiz?.questions.map((q, index) => {
-                    const answerInfo = dailyQuiz.answers[index];
-                    return (
-                      <AccordionItem value={`item-${index}`} key={index}>
-                        <AccordionTrigger>
-                          <div className="flex items-center gap-2">
-                             {answerInfo && answerInfo.result ? (
-                                answerInfo.result.isCorrect ? (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500"/>
-                                ) : (
-                                  <XCircle className="h-5 w-5 text-red-500"/>
-                                )
-                              ) : (
-                                <XCircle className="h-5 w-5 text-muted-foreground"/>
-                              )}
-                            <span className="font-semibold text-left">प्रश्न {index + 1}</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="space-y-3">
-                          <p className="font-semibold">{q.question}</p>
-                          <p><strong>आपका उत्तर:</strong> {answerInfo?.userAnswer || "No answer"}</p>
-                          {answerInfo && !answerInfo.result.isCorrect && <p><strong>सही उत्तर:</strong> {q.answer}</p>}
-                           {answerInfo && answerInfo.result && <p className="text-sm text-muted-foreground p-2 bg-muted/50 rounded-md">{answerInfo.result.summary}</p>}
-                        </AccordionContent>
-                      </AccordionItem>
-                    );
-                  })}
-                </Accordion>
-              </ScrollArea>
-              <Button onClick={handleProceedFromReview} className="w-full mt-4">
-                आगे बढ़ें <ChevronRight className="ml-2 h-4 w-4"/>
-              </Button>
-            </div>
-          );
             
         case 'congratulations':
             return (
@@ -349,11 +300,12 @@ export default function Home() {
             const isFailure = dailyQuiz?.failed;
             const hasSubmitted = dailyQuiz?.submittedDetails;
 
-            const message = isFailure 
-                ? "आपका एक या अधिक उत्तर गलत था।"
-                : hasSubmitted
-                ? "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।"
-                : "आप आज का क्विज पूरा कर चुके हैं। नई प्रश्नोत्तरी के लिए कल फिर आएं।";
+            let message = "आप आज का क्विज पूरा कर चुके हैं। नई प्रश्नोत्तरी के लिए कल फिर आएं।";
+            if(isFailure){
+                message = "आपका एक या अधिक उत्तर गलत था। बेहतर भाग्य अगली बार!";
+            } else if (hasSubmitted) {
+                message = "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।";
+            }
 
             return (
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
