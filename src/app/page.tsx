@@ -48,7 +48,7 @@ export default function Home() {
       } finally {
         setIsLoading(false);
         if (initialLoad) {
-          setTimeout(() => setInitialLoad(false), 1000); // Simulate loading time
+          setInitialLoad(false);
         }
       }
     };
