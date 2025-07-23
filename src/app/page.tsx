@@ -13,7 +13,7 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, XCircle, ShieldQuestion, FileText } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, XCircle, ShieldQuestion, FileText, Info } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
@@ -23,6 +23,7 @@ import { handleQuizWinner } from "@/services/quiz-winner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SecureWrapper } from "@/components/secure-wrapper";
+import Link from 'next/link';
 
 
 const QUIZ_STORAGE_KEY = 'dailyQuiz';
@@ -445,12 +446,19 @@ export default function Home() {
         </div>
       </main>
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50">
-        <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
+        <div className="flex justify-center items-center gap-4">
+            <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
+            <Link href="/about" className="text-primary hover:underline flex items-center gap-1">
+                <Info size={16} /> हमारे बारे में
+            </Link>
+        </div>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
       <SubscribeBanner />
     </div>
   );
 }
+
+    
 
     
