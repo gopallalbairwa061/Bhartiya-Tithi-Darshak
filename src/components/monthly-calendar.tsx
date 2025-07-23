@@ -6,9 +6,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Moon, Star, Sun, Sunset, Link as LinkIcon, CalendarDays } from "lucide-react";
-import { format, getDay, getYear, getMonth } from "date-fns";
+import { format, getYear, getMonth } from "date-fns";
 import { hi } from "date-fns/locale";
-import { DayProps, DayPicker } from "react-day-picker";
+import { DayProps } from "react-day-picker";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -88,7 +88,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     return map;
   }, [festivals]);
 
-  const years = Array.from({ length: 4 }, (_, i) => new Date().getFullYear() - 1 + i); // 2023 to 2026
+  const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i); // e.g. 2022 to 2026
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: i,
     label: format(new Date(2000, i), "LLLL", { locale: hi }),
@@ -115,8 +115,8 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     const dayNumber = props.date.getDate().toLocaleString('hi-IN');
 
     return (
-      <div className="relative h-full w-full flex flex-col items-center justify-start p-1 gap-0.5">
-        <div className="flex-grow-0 font-semibold">{dayNumber}</div>
+      <div className="relative h-full w-full flex flex-col items-center justify-start p-1 pt-2 gap-0.5">
+        <div className="flex-grow-0 text-sm font-semibold">{dayNumber}</div>
         {isLoading ? (
             <div className="flex-grow flex flex-col justify-center items-center w-full gap-1">
                 <Skeleton className="h-2 w-10/12" />
@@ -124,7 +124,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
             </div>
         ) : (
             dayPanchang && (
-            <div className="flex-grow text-[10px] text-muted-foreground leading-tight text-center">
+            <div className="flex-grow text-[11px] text-muted-foreground leading-tight text-center">
               <p className="truncate">{dayPanchang.tithi.split(', ')[1]}</p>
               <p className="truncate">{dayPanchang.nakshatra.name}</p>
             </div>
@@ -149,7 +149,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
         <div className="flex-shrink-0 text-primary">{icon}</div>
         <div>
           <p className="font-semibold text-sm leading-tight">{label}</p>
-          <p className="text-muted-foreground text-xs">{value}</p>
+          <p className="text-muted-foreground text-sm">{value}</p>
         </div>
       </div>
     );
@@ -178,7 +178,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
                 </SelectTrigger>
                 <SelectContent>
                     {years.map(year => (
-                        <SelectItem key={year} value={year.toString()}>{year.toLocaleString('hi-IN')}</SelectItem>
+                        <SelectItem key={year} value={year.toString()}>{year.toLocaleString('hi-IN', { useGrouping: false })}</SelectItem>
                     ))}
                 </SelectContent>
             </Select>
@@ -200,7 +200,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
             month: "p-3",
             caption: "hidden",
             head_cell: "w-12 sm:w-14 md:w-16 text-muted-foreground font-medium",
-            cell: "h-20 sm:h-24 md:h-28 text-center text-sm p-0 relative",
+            cell: "h-24 sm:h-28 md:h-32 text-center text-sm p-0 relative",
             day: "h-full w-full p-1",
             day_selected: "bg-primary/20 text-primary-foreground rounded-md",
             day_today: "bg-accent/50 text-accent-foreground rounded-md",
@@ -212,14 +212,14 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
         footer={
           <div className="p-4 border-t space-y-4">
             <div>
-              <strong className="font-semibold text-base">{format(date, "d MMMM, yyyy", { locale: hi })}</strong>
+              <strong className="font-semibold text-lg">{format(date, "d MMMM, yyyy", { locale: hi })}</strong>
               <Separator className="my-2" />
               <div className="space-y-1">
                 <strong className="font-semibold text-sm">त्योहार:</strong> 
                 <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               {renderPanchangDetail(<Moon size={20} />, "तिथि", selectedDayPanchang?.tithi)}
               {renderPanchangDetail(<Star size={20} />, "नक्षत्र", selectedDayPanchang ? `${selectedDayPanchang.nakshatra.name} ${selectedDayPanchang.nakshatra.endTime}`: undefined)}
               {renderPanchangDetail(<LinkIcon size={20} />, "योग", selectedDayPanchang ? `${selectedDayPanchang.yoga.name} ${selectedDayPanchang.yoga.endTime}`: undefined)}
