@@ -92,6 +92,17 @@ export default function Home() {
     }
   }, [isQuizOpen, quizState]);
   
+  // Auto-advance after 5 seconds on the result screen
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (quizState === 'result') {
+      timer = setTimeout(() => {
+        handleNextQuestion();
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [quizState]);
+  
   const loadOrGenerateQuiz = async () => {
     setQuizState('loading');
     const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -284,7 +295,7 @@ export default function Home() {
                 ? "आपका जवाब गलत है। बेहतर भाग्य अगली बार!"
                 : dailyQuiz?.submittedDetails 
                 ? "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।"
-                : "नई प्रश्नोत्तरी के लिए कल फिर आएं।";
+                : "आप आज का क्विज पूरा कर चुके हैं। नई प्रश्नोत्तरी के लिए कल फिर आएं।";
             return (
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
                     <h2 className="text-2xl font-bold">भाग लेने के लिए धन्यवाद!</h2>
@@ -377,3 +388,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
