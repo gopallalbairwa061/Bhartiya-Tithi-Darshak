@@ -13,7 +13,7 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, XCircle } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
@@ -22,6 +22,7 @@ import { WinnerDetailsForm, WinnerDetails } from "@/components/winner-details-fo
 import { handleQuizWinner } from "@/services/quiz-winner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { SecureWrapper } from "@/components/secure-wrapper";
 
 
 const QUIZ_STORAGE_KEY = 'dailyQuiz';
@@ -121,7 +122,10 @@ export default function Home() {
             if (parsedQuiz.completed) {
                 if (parsedQuiz.failed) {
                     setQuizState('finished');
-                } else {
+                } else if(parsedQuiz.submittedDetails){
+                    setQuizState('finished');
+                }
+                else {
                     setQuizState('congratulations');
                 }
             } else if (parsedQuiz.failed) {
@@ -228,6 +232,8 @@ export default function Home() {
       localStorage.removeItem(QUIZ_STORAGE_KEY);
       setDailyQuiz(null);
       setCurrentQuestionIndex(0);
+      setUserAnswer("");
+      setQuizResult(null);
       setQuizState('idle');
       loadOrGenerateQuiz();
   }
@@ -326,7 +332,7 @@ export default function Home() {
                     <div className="w-full flex flex-col gap-2">
                         <Button onClick={resetQuiz} className="w-full">
                           <RefreshCw className="mr-2 h-4 w-4"/>
-                          {"पुनः प्रश्नोत्तरी खेलें"}
+                          {isFailure ? "पुनः प्रयास करें" : "पुनः प्रश्नोत्तरी खेलें"}
                         </Button>
                       <Button onClick={() => setIsQuizOpen(false)} variant="outline" className="w-full">
                           <HomeIcon className="mr-2 h-4 w-4"/>
@@ -375,9 +381,11 @@ export default function Home() {
                           भारतीय संस्कृति और पंचांग के बारे में अपने ज्ञान का परीक्षण करें।
                         </SheetDescription>
                       </SheetHeader>
-                      <div className="py-4 h-[calc(100%-80px)]">
-                        {renderQuizContent()}
-                      </div>
+                      <SecureWrapper isSecured={isQuizOpen}>
+                          <div className="py-4 h-[calc(100%-80px)]">
+                            {renderQuizContent()}
+                          </div>
+                      </SecureWrapper>
                     </SheetContent>
                   </Sheet>
                   <ThemeToggle />
