@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -6,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search, CalendarHeart } from "lucide-react";
 import { DiyaIcon } from "@/components/icons/diya-icon";
+import { MonthlyCalendar } from "./monthly-calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const festivals = [
     { name: "दिवाली", date: "नवंबर 1, 2024", icon: "diya" },
@@ -73,40 +76,51 @@ export function FestivalSearch() {
   return (
     <Card className="w-full h-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">त्योहार और कार्यक्रम</CardTitle>
-        <div className="relative mt-2">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              type="search"
-              aria-label="त्योहारों या कार्यक्रमों के लिए खोजें"
-              placeholder="त्योहार या कार्यक्रम खोजें..."
-              className="pl-11 h-11 text-base"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-        </div>
+        <CardTitle className="font-headline text-2xl text-accent">त्योहार और कैलेंडर</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[calc(100vh-28rem)] min-h-[400px] pr-4">
-          <ul className="space-y-4">
-            {filteredFestivals.length > 0 ? (
-              filteredFestivals.map((festival) => (
-                <li key={`${festival.name}-${festival.date}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-background/80 transition-colors duration-200 cursor-pointer">
-                  {getIcon(festival.icon)}
-                  <div>
-                    <p className="font-semibold text-lg">{festival.name}</p>
-                    <p className="text-muted-foreground">{festival.date}</p>
+         <Tabs defaultValue="calendar">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="calendar">मासिक कैलेंडर</TabsTrigger>
+            <TabsTrigger value="search">त्योहार खोजें</TabsTrigger>
+          </TabsList>
+          <TabsContent value="calendar" className="mt-4">
+            <MonthlyCalendar festivals={festivals} />
+          </TabsContent>
+          <TabsContent value="search" className="mt-4">
+            <div className="relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="search"
+                  aria-label="त्योहारों या कार्यक्रमों के लिए खोजें"
+                  placeholder="त्योहार या कार्यक्रम खोजें..."
+                  className="pl-11 h-11 text-base"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <ScrollArea className="h-[calc(100vh-32rem)] min-h-[400px] pr-4 mt-4">
+              <ul className="space-y-4">
+                {filteredFestivals.length > 0 ? (
+                  filteredFestivals.map((festival) => (
+                    <li key={`${festival.name}-${festival.date}`} className="flex items-center gap-4 p-3 rounded-lg hover:bg-background/80 transition-colors duration-200 cursor-pointer">
+                      {getIcon(festival.icon)}
+                      <div>
+                        <p className="font-semibold text-lg">{festival.name}</p>
+                        <p className="text-muted-foreground">{festival.date}</p>
+                      </div>
+                    </li>
+                  ))
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-48 text-center">
+                    <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                    <p className="text-muted-foreground">आपकी खोज से कोई त्योहार मेल नहीं खाता।</p>
                   </div>
-                </li>
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center h-48 text-center">
-                <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">आपकी खोज से कोई त्योहार मेल नहीं खाता।</p>
-              </div>
-            )}
-          </ul>
-        </ScrollArea>
+                )}
+              </ul>
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
