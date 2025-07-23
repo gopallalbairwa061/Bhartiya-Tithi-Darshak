@@ -24,6 +24,7 @@ const festivals = [
     { name: "क्रिसमस", date: "दिसंबर 25, 2024", icon: "calendar" },
 
     // 2025 Festivals (Comprehensive List)
+    { name: "नव वर्ष", date: "जनवरी 1, 2025", icon: "calendar" },
     { name: "मकर संक्रांति", date: "जनवरी 14, 2025", icon: "calendar" },
     { name: "गणतंत्र दिवस", date: "जनवरी 26, 2025", icon: "calendar" },
     { name: "वसंत पंचमी", date: "फरवरी 3, 2025", icon: "calendar" },

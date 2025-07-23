@@ -20,7 +20,9 @@ export interface PanchangData {
   samvat: string;
   masa: string;
   tithi: string;
+  tithiNumber: number;
   paksha: string;
+  rashi: string;
   nakshatra: Detail;
   yoga: Detail;
   karana: Detail;
@@ -44,6 +46,13 @@ const nakshatras = [
   "पूर्वा फाल्गुनी", "उत्तरा फाल्गुनी", "हस्त", "चित्रा", "स्वाति", "विशाखा", "अनुराधा", "ज्येष्ठा", "मूल",
   "पूर्वाषाढ़ा", "उत्तराषाढ़ा", "श्रवण", "धनिष्ठा", "शतभिषा", "पूर्व भाद्रपद", "उत्तर भाद्रपद", "रेवती"
 ];
+
+const rashis = [
+    "मेष", "मेष", "वृषभ", "वृषभ", "मिथुन", "मिथुन", "कर्क", "कर्क", "सिंह", "सिंह", 
+    "कन्या", "कन्या", "तुला", "तुला", "वृश्चिक", "वृश्चिक", "धनु", "धनु", "धनु", 
+    "मकर", "मकर", "मकर", "कुंभ", "कुंभ", "मीन", "मीन", "मेष"
+];
+
 
 const yogas = [
     "विष्कुम्भ", "प्रीति", "आयुष्मान", "सौभाग्य", "शोभन", "अतिगण्ड", "सुकर्मा", "धृति", "शूल", "गण्ड", 
@@ -147,6 +156,7 @@ export async function getPanchangForMonth(year: number, month: number): Promise<
     const karanaIndex2 = (karanaBaseIndex + 1) % karanas.length;
 
     const paksha = tithiIndex < 15 ? "शुक्ल पक्ष" : "कृष्ण पक्ष";
+    const tithiNumberInPaksha = tithiIndex < 15 ? tithiIndex + 1 : tithiIndex - 14;
 
     const dayOfYear = differenceInDays(date, startOfYear(date));
     const seasonalFactor = Math.sin((dayOfYear - 80) * (2 * Math.PI) / 365.25);
@@ -169,6 +179,8 @@ export async function getPanchangForMonth(year: number, month: number): Promise<
       masa: purnimantaMasas[masaIndex],
       paksha: paksha,
       tithi: `${paksha}, ${tithis[tithiIndex]}`,
+      tithiNumber: tithiNumberInPaksha,
+      rashi: rashis[nakshatraIndex],
       nakshatra: {
         name: nakshatras[nakshatraIndex],
         endTime: formatEndTime(nakshatraEndTimeDecimal)

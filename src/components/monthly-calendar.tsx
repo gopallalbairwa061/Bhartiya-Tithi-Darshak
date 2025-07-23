@@ -6,12 +6,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, Moon, Star, Sun, Sunset, Link as LinkIcon, CalendarDays } from "lucide-react";
-import { format, getYear, getMonth, set } from "date-fns";
+import { format, getYear, getMonth, set, getDay } from "date-fns";
 import { hi } from "date-fns/locale";
 import { DayProps } from "react-day-picker";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 
 type Festival = {
@@ -81,7 +82,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
 
 
   const festivalsByDate = useMemo(() => {
-    const map = new Map<string, string[]>();
+    const map = new Map<string, Festival[]>();
     festivals.forEach((festival) => {
         const d = parseHindiDate(festival.date);
         if (d) {
@@ -89,7 +90,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
             if (!map.has(dateStr)) {
                 map.set(dateStr, []);
             }
-            map.get(dateStr)?.push(festival.name);
+            map.get(dateStr)?.push(festival);
         }
     });
     return map;
@@ -119,30 +120,40 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
     const dateStr = format(props.date, "yyyy-MM-dd");
     const dayFestivals = festivalsByDate.get(dateStr);
     const dayPanchang = panchangData.get(dateStr);
-    const dayNumber = props.date.getDate().toLocaleString('hi-IN');
+    const dayNumber = props.date.getDate();
+    const isSunday = getDay(props.date) === 0;
 
     return (
-      <div className="relative h-full w-full flex flex-col items-center justify-start p-1 pt-2 gap-0.5">
-        <div className="flex-grow-0 text-sm font-semibold">{dayNumber}</div>
+      <div className="relative h-full w-full flex flex-col justify-between p-1.5 text-left">
         {isLoading ? (
-            <div className="flex-grow flex flex-col justify-center items-center w-full gap-1">
-                <Skeleton className="h-2 w-10/12" />
+            <div className="flex flex-col gap-1.5">
+                <Skeleton className="h-2.5 w-10/12" />
+                <Skeleton className="h-8 w-6 mx-auto" />
+                <Skeleton className="h-2 w-full" />
                 <Skeleton className="h-2 w-8/12" />
             </div>
-        ) : (
-            dayPanchang && (
-            <div className="flex-grow text-[11px] text-muted-foreground leading-tight text-center">
-              <p className="truncate">{dayPanchang.tithi.split(', ')[1]}</p>
-              <p className="truncate">{dayPanchang.nakshatra.name}</p>
-            </div>
-          )
-        )}
-        {dayFestivals && (
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex space-x-0.5">
-            {dayFestivals.slice(0, 3).map((_, index) => (
-                <div key={index} className="h-1.5 w-1.5 rounded-full bg-primary" />
-            ))}
-          </div>
+        ) : dayPanchang && (
+            <>
+                <div className="text-[10px] text-muted-foreground leading-tight">
+                    <span>{dayPanchang.paksha === "शुक्ल पक्ष" ? 'शु' : 'कृ'} {dayPanchang.tithi.split(', ')[1].split(' ')[0]}</span>
+                    <span> / {dayPanchang.tithiNumber}</span>
+                </div>
+
+                <div className="flex-grow flex flex-col items-center justify-center">
+                    <span className={cn("text-3xl lg:text-4xl font-bold", isSunday && "text-destructive")}>{dayNumber.toLocaleString('hi-IN')}</span>
+                     {dayFestivals && dayFestivals.map(f => (
+                        <span key={f.name} className="mt-1 text-[10px] font-semibold text-destructive leading-tight tracking-tighter text-center">
+                           {f.name}
+                        </span>
+                    ))}
+                </div>
+
+                <div className="text-[10px] text-muted-foreground leading-tight text-center">
+                    <span>• {dayPanchang.rashi} {dayPanchang.nakshatra.endTime.split(' ')[1]}</span>
+                    <span className="font-sans"> ☆ </span>
+                    <span>{dayPanchang.nakshatra.name}</span>
+                </div>
+            </>
         )}
       </div>
     );
@@ -213,11 +224,11 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
             month: "p-3",
             caption: "hidden",
             head_cell: "w-12 sm:w-16 md:w-20 lg:w-24 text-muted-foreground font-medium border-b",
-            cell: "h-24 sm:h-28 md:h-32 lg:h-36 text-center text-sm p-0 relative border-b border-r",
-            day: "h-full w-full p-1",
-            day_selected: "bg-primary/20 text-primary-foreground rounded-md",
-            day_today: "bg-accent/50 text-accent-foreground rounded-md",
-            day_outside: "text-muted-foreground/50",
+            cell: "h-28 sm:h-32 md:h-36 lg:h-40 text-center text-sm p-0 relative border-b border-r",
+            day: "h-full w-full p-0",
+            day_selected: "bg-primary/20 text-primary-foreground rounded-none",
+            day_today: "bg-accent/50 text-accent-foreground rounded-none",
+            day_outside: "text-muted-foreground/50 bg-background/50",
             head_row: "border-b",
         }}
         components={{
@@ -230,7 +241,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
               <Separator className="my-2" />
               <div className="space-y-1">
                 <strong className="font-semibold text-sm">त्योहार:</strong> 
-                <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(selectedDate, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
+                <p className="text-muted-foreground text-sm">{festivalsByDate.get(format(selectedDate, "yyyy-MM-dd"))?.map(f => f.name).join(", ") || "कोई नहीं"}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-4">
