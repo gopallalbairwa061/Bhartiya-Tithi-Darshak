@@ -14,7 +14,9 @@ import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { BrainCircuit } from "lucide-react";
-
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { askPanchang } from "@/ai/flows/ask-panchang-flow";
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -22,6 +24,10 @@ export default function Home() {
   const [selectedPanchang, setSelectedPanchang] = useState<PanchangData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [isQuizOpen, setIsQuizOpen] = useState(false);
+  const [quizQuestion, setQuizQuestion] = useState("");
+  const [quizAnswer, setQuizAnswer] = useState("");
+  const [isAsking, setIsAsking] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -61,6 +67,22 @@ export default function Home() {
     fetchPanchang();
   }, [selectedDate, initialLoad]);
 
+  const handleAskQuestion = async () => {
+    if (!quizQuestion.trim() || !selectedPanchang) return;
+    setIsAsking(true);
+    setQuizAnswer("");
+    try {
+      const answer = await askPanchang({ question: quizQuestion, panchang: selectedPanchang });
+      setQuizAnswer(answer);
+    } catch (error) {
+      console.error("Error getting answer:", error);
+      setQuizAnswer("माफ़ कीजिये, मुझे इसका उत्तर नहीं पता।");
+    } finally {
+      setIsAsking(false);
+    }
+  };
+
+
   const vsDateString = selectedPanchang ? `${selectedPanchang.masa}, ${selectedPanchang.samvat}` : "विक्रम संवत २०८१";
 
   if (initialLoad) {
@@ -70,23 +92,54 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
       <main className="flex-grow container mx-auto px-4 py-8 pb-32">
-        <header className="text-center mb-12 relative">
-            <div className="flex justify-center items-center gap-4 mb-4">
-                <LogoIcon className="h-16 w-16" />
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-chart-1 via-chart-2 to-chart-3">
-                    भारतीय तिथि दर्शक
-                </h1>
+        <header className="mb-12">
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-4">
+                    <LogoIcon className="h-12 w-12" />
+                    <h1 className="text-3xl md:text-4xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-chart-1 via-chart-2 to-chart-3">
+                        भारतीय तिथि दर्शक
+                    </h1>
+                </div>
+                <div className="flex items-center gap-2">
+                   <Sheet open={isQuizOpen} onOpenChange={setIsQuizOpen}>
+                    <SheetTrigger asChild>
+                         <Button variant="outline">
+                           <BrainCircuit className="mr-2 h-4 w-4" />
+                           प्रश्नोत्तरी
+                         </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                      <SheetHeader>
+                        <SheetTitle>पंचांग प्रश्नोत्तरी</SheetTitle>
+                        <SheetDescription>
+                          आज के पंचांग के बारे में कोई भी प्रश्न पूछें।
+                        </SheetDescription>
+                      </SheetHeader>
+                      <div className="grid gap-4 py-4">
+                        <Textarea 
+                          placeholder="आपका प्रश्न यहाँ लिखें..." 
+                          value={quizQuestion}
+                          onChange={(e) => setQuizQuestion(e.target.value)}
+                          rows={4}
+                        />
+                        <Button onClick={handleAskQuestion} disabled={isAsking || !quizQuestion.trim()}>
+                          {isAsking ? "पूछ रहा है..." : "प्रश्न पूछें"}
+                        </Button>
+                        {quizAnswer && (
+                          <div className="p-4 bg-muted/50 rounded-md border border-border/80">
+                            <p className="font-semibold">उत्तर:</p>
+                            <p>{quizAnswer}</p>
+                          </div>
+                        )}
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                  <ThemeToggle />
+                </div>
             </div>
-          <p className="text-lg md:text-xl text-muted-foreground mt-2 animate-fade-in">
+          <p className="text-center text-base md:text-lg text-muted-foreground animate-fade-in">
             {currentDateTime ? `${currentDateTime} | ${vsDateString}` : <span className="inline-block h-6 w-96 bg-primary/20 rounded animate-pulse"></span>}
           </p>
-          <div className="absolute top-0 right-0 flex items-center gap-2">
-            <Button variant="outline">
-              <BrainCircuit className="mr-2 h-4 w-4" />
-              प्रश्नोत्तरी
-            </Button>
-            <ThemeToggle />
-          </div>
         </header>
         
         <div className="max-w-md mx-auto w-full mb-8">
