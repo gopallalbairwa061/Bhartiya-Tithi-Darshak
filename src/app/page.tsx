@@ -64,7 +64,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-8 pb-32">
         <header className="text-center mb-12 flex flex-col items-center">
             <LogoIcon className="h-16 w-16 mb-4" />
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-accent tracking-tight">
@@ -87,7 +87,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50 mt-8">
+      <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50">
         <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
