@@ -13,10 +13,11 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit } from "lucide-react";
+import { BrainCircuit, RefreshCw } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
+import { generateQuestion, evaluateAnswer, QuizQuestion } from "@/ai/flows/panchang-quiz-flow";
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -25,9 +26,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
-  const [quizQuestion, setQuizQuestion] = useState("");
-  const [quizAnswer, setQuizAnswer] = useState("");
-  const [isAsking, setIsAsking] = useState(false);
+  
+  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result'>('idle');
+  const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(null);
+  const [userAnswer, setUserAnswer] = useState("");
+  const [quizResult, setQuizResult] = useState<{ isCorrect: boolean; summary: string } | null>(null);
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -67,21 +71,42 @@ export default function Home() {
     fetchPanchang();
   }, [selectedDate, initialLoad]);
 
-  const handleAskQuestion = async () => {
-    if (!quizQuestion.trim() || !selectedPanchang) return;
-    setIsAsking(true);
-    setQuizAnswer("");
+  useEffect(() => {
+    if (isQuizOpen && quizState === 'idle') {
+      handleGenerateQuestion();
+    }
+  }, [isQuizOpen, quizState]);
+
+  const handleGenerateQuestion = async () => {
+    setQuizState('loading');
+    setUserAnswer("");
+    setQuizResult(null);
     try {
-      const answer = await askPanchang({ question: quizQuestion, panchang: selectedPanchang });
-      setQuizAnswer(answer);
+      const question = await generateQuestion();
+      setCurrentQuestion(question);
+      setQuizState('question');
     } catch (error) {
-      console.error("Error getting answer:", error);
-      setQuizAnswer("माफ़ कीजिये, मुझे इसका उत्तर नहीं पता।");
-    } finally {
-      setIsAsking(false);
+      console.error("Error generating question:", error);
+      setQuizState('idle');
     }
   };
 
+  const handleEvaluateAnswer = async () => {
+    if (!userAnswer.trim() || !currentQuestion) return;
+    setQuizState('evaluating');
+    try {
+      const result = await evaluateAnswer({
+        question: currentQuestion.question,
+        answer: currentQuestion.answer,
+        userAnswer: userAnswer,
+      });
+      setQuizResult(result);
+      setQuizState('result');
+    } catch (error) {
+      console.error("Error evaluating answer:", error);
+      setQuizState('question');
+    }
+  };
 
   const vsDateString = selectedPanchang ? `${selectedPanchang.masa}, ${selectedPanchang.samvat}` : "विक्रम संवत २०८१";
 
@@ -110,26 +135,55 @@ export default function Home() {
                     </SheetTrigger>
                     <SheetContent>
                       <SheetHeader>
-                        <SheetTitle>पंचांग प्रश्नोत्तरी</SheetTitle>
+                        <SheetTitle>पंचांग और संस्कृति प्रश्नोत्तरी</SheetTitle>
                         <SheetDescription>
-                          आज के पंचांग के बारे में कोई भी प्रश्न पूछें।
+                          भारतीय संस्कृति और पंचांग के बारे में अपने ज्ञान का परीक्षण करें।
                         </SheetDescription>
                       </SheetHeader>
-                      <div className="grid gap-4 py-4">
-                        <Textarea 
-                          placeholder="आपका प्रश्न यहाँ लिखें..." 
-                          value={quizQuestion}
-                          onChange={(e) => setQuizQuestion(e.target.value)}
-                          rows={4}
-                        />
-                        <Button onClick={handleAskQuestion} disabled={isAsking || !quizQuestion.trim()}>
-                          {isAsking ? "पूछ रहा है..." : "प्रश्न पूछें"}
-                        </Button>
-                        {quizAnswer && (
-                          <div className="p-4 bg-muted/50 rounded-md border border-border/80">
-                            <p className="font-semibold">उत्तर:</p>
-                            <p>{quizAnswer}</p>
-                          </div>
+                      <div className="grid gap-4 py-4 h-full">
+                        {quizState === 'loading' && <p>प्रश्न लोड हो रहा है...</p>}
+                        
+                        {quizState === 'question' || quizState === 'evaluating' ? (
+                          <>
+                            <p className="font-semibold text-lg">{currentQuestion?.question}</p>
+                             <Textarea 
+                              placeholder="आपका उत्तर यहाँ लिखें..." 
+                              value={userAnswer}
+                              onChange={(e) => setUserAnswer(e.target.value)}
+                              rows={4}
+                            />
+                            <Button onClick={handleEvaluateAnswer} disabled={quizState === 'evaluating' || !userAnswer.trim()}>
+                              {quizState === 'evaluating' ? "जाँच हो रही है..." : "उत्तर दें"}
+                            </Button>
+                          </>
+                        ) : null}
+
+                        {quizState === 'result' && quizResult && (
+                           <div className="p-4 bg-muted/50 rounded-md border border-border/80 space-y-4">
+                              <div>
+                                <p className={`font-bold text-lg ${quizResult.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                  {quizResult.isCorrect ? "सही जवाब!" : "पुनः प्रयास करें"}
+                                </p>
+                                <p className="text-muted-foreground mt-1">{currentQuestion?.question}</p>
+                                <p className="font-semibold mt-1">आपका उत्तर: <span className="font-normal">{userAnswer}</span></p>
+                              </div>
+                             
+                              <div className="space-y-1">
+                                <p className="font-semibold">सारांश:</p>
+                                <p>{quizResult.summary}</p>
+                              </div>
+                              <Button onClick={handleGenerateQuestion} variant="outline" className="w-full">
+                                  <RefreshCw className="mr-2 h-4 w-4"/>
+                                  अगला प्रश्न
+                              </Button>
+                           </div>
+                        )}
+                        
+                        {(quizState === 'question' || quizState === 'result') && (
+                            <Button onClick={handleGenerateQuestion} variant="ghost" size="sm" className="mt-auto">
+                                <RefreshCw className="mr-2 h-4 w-4"/>
+                                दूसरा प्रश्न पूछें
+                            </Button>
                         )}
                       </div>
                     </SheetContent>
