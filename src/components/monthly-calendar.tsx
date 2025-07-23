@@ -162,6 +162,11 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
     );
   };
 
+  const formatWeekdayName = (day: Date) => {
+    return format(day, 'cccc', { locale: hi });
+  };
+
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center p-2 rounded-md bg-background/50">
@@ -201,17 +206,19 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
         month={currentMonth}
         onMonthChange={setCurrentMonth}
         locale={hi}
+        formatters={{ formatWeekdayName }}
         className="rounded-md border p-0"
         classNames={{
             months: "p-0",
             month: "p-3",
             caption: "hidden",
-            head_cell: "w-12 sm:w-14 md:w-16 text-muted-foreground font-medium",
-            cell: "h-24 sm:h-28 md:h-32 text-center text-sm p-0 relative",
+            head_cell: "w-12 sm:w-14 md:w-16 text-muted-foreground font-medium border-b",
+            cell: "h-24 sm:h-28 md:h-32 text-center text-sm p-0 relative border-b border-r",
             day: "h-full w-full p-1",
             day_selected: "bg-primary/20 text-primary-foreground rounded-md",
             day_today: "bg-accent/50 text-accent-foreground rounded-md",
             day_outside: "text-muted-foreground/50",
+            head_row: "border-b",
         }}
         components={{
             Day: DayWithDetails
@@ -240,3 +247,5 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
     </div>
   );
 }
+
+    
