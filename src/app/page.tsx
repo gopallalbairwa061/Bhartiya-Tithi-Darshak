@@ -122,7 +122,10 @@ export default function Home() {
                  setQuizState('review');
             } else if (parsedQuiz.failed) {
                 setQuizState('finished');
-            } else {
+            } else if (parsedQuiz.completed) {
+                setQuizState('review');
+            }
+            else {
                 setQuizState('question');
             }
             return;
@@ -300,19 +303,23 @@ export default function Home() {
                       <AccordionItem value={`item-${index}`} key={index}>
                         <AccordionTrigger>
                           <div className="flex items-center gap-2">
-                            {answerInfo?.result.isCorrect ? (
-                              <CheckCircle2 className="h-5 w-5 text-green-500"/>
-                            ) : (
-                              <XCircle className="h-5 w-5 text-red-500"/>
-                            )}
+                             {answerInfo && answerInfo.result ? (
+                                answerInfo.result.isCorrect ? (
+                                  <CheckCircle2 className="h-5 w-5 text-green-500"/>
+                                ) : (
+                                  <XCircle className="h-5 w-5 text-red-500"/>
+                                )
+                              ) : (
+                                <XCircle className="h-5 w-5 text-muted-foreground"/>
+                              )}
                             <span className="font-semibold text-left">प्रश्न {index + 1}</span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="space-y-3">
                           <p className="font-semibold">{q.question}</p>
                           <p><strong>आपका उत्तर:</strong> {answerInfo?.userAnswer || "No answer"}</p>
-                          {!answerInfo?.result.isCorrect && <p><strong>सही उत्तर:</strong> {q.answer}</p>}
-                          <p className="text-sm text-muted-foreground p-2 bg-muted/50 rounded-md">{answerInfo?.result.summary}</p>
+                          {answerInfo && !answerInfo.result.isCorrect && <p><strong>सही उत्तर:</strong> {q.answer}</p>}
+                           {answerInfo && answerInfo.result && <p className="text-sm text-muted-foreground p-2 bg-muted/50 rounded-md">{answerInfo.result.summary}</p>}
                         </AccordionContent>
                       </AccordionItem>
                     );
@@ -340,20 +347,23 @@ export default function Home() {
 
         case 'finished':
             const isFailure = dailyQuiz?.failed;
-            const message = isFailure
-                ? "आपका जवाब गलत है। बेहतर भाग्य अगली बार!"
-                : dailyQuiz?.submittedDetails 
+            const hasSubmitted = dailyQuiz?.submittedDetails;
+
+            const message = isFailure 
+                ? "आपका एक या अधिक उत्तर गलत था।"
+                : hasSubmitted
                 ? "आपका विवरण सफलतापूर्वक सबमिट हो गया है। हम जल्द ही आपसे संपर्क करेंगे।"
                 : "आप आज का क्विज पूरा कर चुके हैं। नई प्रश्नोत्तरी के लिए कल फिर आएं।";
+
             return (
                 <div className="flex flex-col items-center justify-center text-center h-full gap-4">
                     <h2 className="text-2xl font-bold">भाग लेने के लिए धन्यवाद!</h2>
                     <p className="text-muted-foreground">{message}</p>
                     <div className="w-full flex flex-col gap-2">
-                      <Button onClick={resetQuiz} className="w-full">
-                        <RefreshCw className="mr-2 h-4 w-4"/>
-                        {"पुनः प्रश्नोत्तरी खेलें"}
-                      </Button>
+                        <Button onClick={resetQuiz} className="w-full">
+                          <RefreshCw className="mr-2 h-4 w-4"/>
+                          {"पुनः प्रश्नोत्तरी खेलें"}
+                        </Button>
                       <Button onClick={() => setIsQuizOpen(false)} variant="outline" className="w-full">
                           <HomeIcon className="mr-2 h-4 w-4"/>
                           होम पेज पर जाएं
