@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { BellRing, Mail, X } from "lucide-react";
+import { Gift, Mail, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export function SubscribeBanner() {
@@ -16,7 +17,7 @@ export function SubscribeBanner() {
     setIsVisible(false);
     toast({
       title: "सदस्यता के लिए धन्यवाद!",
-      description: "आपको अब त्योहारों और महत्वपूर्ण तिथियों के लिए सूचनाएं प्राप्त होंगी।",
+      description: "आपको अब प्रश्नोत्तरी और त्योहारों के लिए सूचनाएं प्राप्त होंगी।",
       variant: "default",
     });
   };
@@ -40,11 +41,11 @@ export function SubscribeBanner() {
             <CardHeader className="pb-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/20 rounded-full">
-                        <BellRing className="h-6 w-6 text-primary" />
+                        <Gift className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                        <CardTitle className="text-lg font-headline text-primary">सूचित रहें</CardTitle>
-                        <CardDescription className="text-sm">त्योहारों की सूचनाएं पाएं।</CardDescription>
+                        <CardTitle className="text-lg font-headline text-primary">दैनिक प्रश्नोत्तरी खेलें!</CardTitle>
+                        <CardDescription className="text-sm">₹50 तक का पुरस्कार जीतने का मौका पाएं।</CardDescription>
                     </div>
                 </div>
             </CardHeader>
