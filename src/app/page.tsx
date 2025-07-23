@@ -290,12 +290,10 @@ export default function Home() {
                     <h2 className="text-2xl font-bold">भाग लेने के लिए धन्यवाद!</h2>
                     <p className="text-muted-foreground">{message}</p>
                     <div className="w-full flex flex-col gap-2">
-                      {isFailure && (
-                        <Button onClick={resetQuiz} className="w-full">
-                          <RefreshCw className="mr-2 h-4 w-4"/>
-                          पुनः प्रयास करें
-                        </Button>
-                      )}
+                      <Button onClick={resetQuiz} className="w-full">
+                        <RefreshCw className="mr-2 h-4 w-4"/>
+                        {isFailure ? "पुनः प्रयास करें" : "पुनः प्रश्नोत्तरी खेलें"}
+                      </Button>
                       <Button onClick={() => setIsQuizOpen(false)} variant="outline" className="w-full">
                           <HomeIcon className="mr-2 h-4 w-4"/>
                           होम पेज पर जाएं
@@ -379,5 +377,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
