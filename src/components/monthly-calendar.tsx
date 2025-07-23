@@ -218,18 +218,18 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
         onMonthChange={setCurrentMonth}
         locale={hi}
         formatters={{ formatWeekdayName }}
-        className="rounded-md border p-0"
+        className="rounded-md p-0"
         classNames={{
             months: "p-0",
             month: "p-3",
             caption: "hidden",
-            head_cell: "w-full text-muted-foreground font-medium border-b",
-            cell: "h-36 text-center text-sm p-0 relative border-b border-r",
+            head_cell: "w-full text-muted-foreground font-medium",
+            cell: "h-36 text-center text-sm p-0 relative",
             day: "h-full w-full p-0",
             day_selected: "bg-primary/20 text-primary-foreground rounded-none",
             day_today: "bg-accent/50 text-accent-foreground rounded-none",
             day_outside: "text-muted-foreground/50 bg-background/50",
-            head_row: "border-b",
+            head_row: "",
         }}
         components={{
             Day: DayWithDetails
