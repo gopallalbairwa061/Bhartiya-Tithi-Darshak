@@ -13,7 +13,7 @@ interface PanchangDetailCardProps {
 const DetailRow = ({ icon, label, value, isLoading }: { icon: React.ReactNode; label: string; value?: string; isLoading: boolean }) => (
   <div className="flex justify-between items-center py-2 text-base">
     <div className="flex items-center gap-3">
-      <div className="h-5 w-5 text-primary flex-shrink-0">{icon}</div>
+      <div className="h-5 w-5 text-secondary flex-shrink-0">{icon}</div>
       <p className="font-semibold text-foreground/90">{label}</p>
     </div>
     {isLoading ? (
@@ -27,7 +27,7 @@ const DetailRow = ({ icon, label, value, isLoading }: { icon: React.ReactNode; l
 const MuhuratRow = ({ icon, label, value, isLoading, type }: { icon: React.ReactNode; label: string; value?: string; isLoading: boolean, type: 'good' | 'bad' }) => (
     <div className="flex justify-between items-center py-2 text-base">
       <div className="flex items-center gap-3">
-        <div className={`h-5 w-5 ${type === 'good' ? 'text-green-600' : 'text-destructive'} flex-shrink-0`}>{icon}</div>
+        <div className={`h-5 w-5 ${type === 'good' ? 'text-green-500' : 'text-red-500'} flex-shrink-0`}>{icon}</div>
          <p className="font-semibold text-foreground/90">{label}</p>
       </div>
       {isLoading ? (

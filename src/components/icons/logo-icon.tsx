@@ -12,8 +12,11 @@ export function LogoIcon(props: SVGProps<SVGSVGElement>) {
     >
       <defs>
         <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 1 }} />
-          <stop offset="100%" style={{ stopColor: 'hsl(var(--accent))', stopOpacity: 1 }} />
+          <stop offset="0%" style={{ stopColor: 'hsl(var(--chart-1))', stopOpacity: 1 }} />
+          <stop offset="25%" style={{ stopColor: 'hsl(var(--chart-2))', stopOpacity: 1 }} />
+          <stop offset="50%" style={{ stopColor: 'hsl(var(--chart-3))', stopOpacity: 1 }} />
+          <stop offset="75%" style={{ stopColor: 'hsl(var(--chart-4))', stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: 'hsl(var(--chart-5))', stopOpacity: 1 }} />
         </linearGradient>
       </defs>
       <rect width="100" height="100" rx="24" fill="url(#logo-gradient)" />

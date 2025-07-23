@@ -69,11 +69,11 @@ export default function Home() {
         <header className="text-center mb-12">
             <div className="flex justify-center items-center gap-4 mb-4">
                 <LogoIcon className="h-16 w-16" />
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-accent tracking-tight">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500">
                     भारतीय तिथि दर्शक
                 </h1>
             </div>
-          <p className="text-lg md:text-xl text-primary mt-2 animate-fade-in">
+          <p className="text-lg md:text-xl text-secondary mt-2 animate-fade-in">
             {currentDateTime ? `${currentDateTime} | ${vsDateString}` : <span className="inline-block h-6 w-96 bg-primary/20 rounded animate-pulse"></span>}
           </p>
         </header>
