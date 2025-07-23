@@ -2,36 +2,32 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronLeft, ChevronRight, Moon, Star, Sun, Sunset, Link as LinkIcon, CalendarDays } from "lucide-react";
-import { format, getYear, getMonth, set, getDay, eachDayOfInterval, startOfMonth, endOfMonth } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { format, getYear, getMonth, getDay, eachDayOfInterval, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
 import { hi } from "date-fns/locale";
-import { DayProps, useDayPicker, useNavigation } from "react-day-picker";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Festival } from "@/services/festivals";
+import { CalendarHeart, Star, Moon } from "lucide-react";
+import { DiyaIcon } from "./icons/diya-icon";
 
-
-type Festival = {
-  name: string;
-  date: string;
-  icon: string;
-};
 
 interface MonthlyCalendarProps {
   festivals: Festival[];
   onDateSelect: (date: Date) => void;
+  onMonthChange: (date: Date) => void;
+  currentMonth: Date;
 }
 
-const monthMap: { [key: string]: number } = {
-  'जनवरी': 0, 'फरवरी': 1, 'मार्च': 2, 'अप्रैल': 3, 'मई': 4, 'जून': 5,
-  'जुलाई': 6, 'अगस्त': 7, 'सितंबर': 8, 'अक्टूबर': 9, 'नवंबर': 10, 'दिसंबर': 11
-};
-
+// This was moved from festivals.ts to avoid the server action error
 const parseHindiDate = (dateString: string): Date | null => {
+  const monthMap: { [key: string]: number } = {
+    'जनवरी': 0, 'फरवरी': 1, 'मार्च': 2, 'अप्रैल': 3, 'मई': 4, 'जून': 5,
+    'जुलाई': 6, 'अगस्त': 7, 'सितंबर': 8, 'अक्टूबर': 9, 'नवंबर': 10, 'दिसंबर': 11
+  };
   const parts = dateString.replace(/,/g, '').split(' ');
   if (parts.length === 3) {
     const monthName = parts[0];
@@ -43,6 +39,7 @@ const parseHindiDate = (dateString: string): Date | null => {
       return new Date(year, month, day);
     }
   }
+  // Fallback for standard date strings
   const parsedDate = new Date(dateString);
   if (!isNaN(parsedDate.getTime())) {
     return parsedDate;
@@ -51,30 +48,33 @@ const parseHindiDate = (dateString: string): Date | null => {
 };
 
 
-export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, currentMonth }: MonthlyCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [panchangData, setPanchangData] = useState<Map<string, PanchangData>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPanchangData = async () => {
-      setIsLoading(true);
-      const year = getYear(currentMonth);
-      const month = getMonth(currentMonth);
-      try {
-        const data = await getPanchangForMonth(year, month);
-        const map = new Map<string, PanchangData>();
-        data.forEach(p => map.set(p.date, p));
-        setPanchangData(map);
-      } catch (error) {
-        console.error("Failed to fetch panchang data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchPanchangData();
-  }, [currentMonth]);
+    // Only fetch if the new month is different from the current panchang month
+    const currentPanchangMonth = panchangData.size > 0 ? new Date(panchangData.keys().next().value) : null;
+    if (!currentPanchangMonth || !isSameMonth(currentMonth, currentPanchangMonth)) {
+      const fetchPanchangData = async () => {
+        setIsLoading(true);
+        const year = getYear(currentMonth);
+        const month = getMonth(currentMonth);
+        try {
+          const data = await getPanchangForMonth(year, month);
+          const map = new Map<string, PanchangData>();
+          data.forEach(p => map.set(p.date, p));
+          setPanchangData(map);
+        } catch (error) {
+          console.error("Failed to fetch panchang data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      fetchPanchangData();
+    }
+  }, [currentMonth, panchangData]);
 
   useEffect(() => {
     onDateSelect(selectedDate);
@@ -105,21 +105,26 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
   const handleYearChange = (year: string) => {
     const newDate = new Date(currentMonth);
     newDate.setFullYear(parseInt(year, 10));
-    setCurrentMonth(newDate);
+    onMonthChange(newDate);
   };
 
   const handleMonthChange = (month: string) => {
     const newDate = new Date(currentMonth);
     newDate.setMonth(parseInt(month, 10));
-    setCurrentMonth(newDate);
+    onMonthChange(newDate);
   };
   
-  const selectedDayPanchang = panchangData.get(format(selectedDate, "yyyy-MM-dd"));
-
   const daysInMonth = eachDayOfInterval({
     start: startOfMonth(currentMonth),
     end: endOfMonth(currentMonth),
   });
+
+  const getFestivalIcon = (iconName: string) => {
+    if (iconName === "diya") {
+      return <DiyaIcon className="h-4 w-4 text-chart-5" />;
+    }
+    return <CalendarHeart className="h-4 w-4 text-chart-4" />;
+  };
 
   const DayWithDetails = ({ date }: { date: Date }) => {
     const dateStr = format(date, "yyyy-MM-dd");
@@ -154,10 +159,17 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
                 </div>
             ) : dayPanchang ? (
                 <>
-                   <p className="text-chart-2"><strong className="font-semibold text-foreground/80">तिथि:</strong> {dayPanchang.tithi}</p>
-                   <p className="text-chart-3"><strong className="font-semibold text-foreground/80">नक्षत्र:</strong> {dayPanchang.nakshatra.name} ({dayPanchang.nakshatra.endTime})</p>
+                   <p className="flex items-center gap-2 text-chart-2"><Moon size={16}/> <strong className="font-semibold text-foreground/80">तिथि:</strong> {dayPanchang.tithi}</p>
+                   <p className="flex items-center gap-2 text-chart-3"><Star size={16}/> <strong className="font-semibold text-foreground/80">नक्षत्र:</strong> {dayPanchang.nakshatra.name}</p>
                    {dayFestivals && dayFestivals.length > 0 && (
-                        <p className="font-bold text-chart-5">{dayFestivals.map(f => f.name).join(', ')}</p>
+                        <div className="flex flex-wrap gap-2 pt-1">
+                            {dayFestivals.map(f => (
+                                <div key={f.name} className="flex items-center gap-1.5 p-1 px-2 text-sm rounded-full bg-primary/10 text-chart-5 font-bold">
+                                    {getFestivalIcon(f.icon)}
+                                    <span>{f.name}</span>
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </>
             ) : (
@@ -171,7 +183,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center p-2 rounded-md bg-muted/50">
-        <Button variant="outline" size="icon" onClick={() => setCurrentMonth(d => new Date(d.setMonth(d.getMonth() - 1)))}>
+        <Button variant="outline" size="icon" onClick={() => onMonthChange(new Date(currentMonth.setMonth(currentMonth.getMonth() - 1)))}>
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <div className="flex items-center gap-2">
@@ -196,7 +208,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
                 </SelectContent>
             </Select>
         </div>
-        <Button variant="outline" size="icon" onClick={() => setCurrentMonth(d => new Date(d.setMonth(d.getMonth() + 1)))}>
+        <Button variant="outline" size="icon" onClick={() => onMonthChange(new Date(currentMonth.setMonth(currentMonth.getMonth() + 1)))}>
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
