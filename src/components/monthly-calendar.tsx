@@ -6,8 +6,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format } from "date-fns";
+import { format, getDay } from "date-fns";
 import { hi } from "date-fns/locale";
+import { DayProps } from "react-day-picker";
 
 type Festival = {
   name: string;
@@ -64,7 +65,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     return map;
   }, [festivals]);
 
-  const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - 5 + i);
+  const years = Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - 10 + i);
   const months = Array.from({ length: 12 }, (_, i) => ({
     value: i,
     label: format(new Date(2000, i), "LLLL", { locale: hi }),
@@ -82,17 +83,17 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
     setDate(newDate);
   };
 
-  const DayWithFestival = ({ date, ...props }: { date: Date } & any) => {
-    const dateStr = format(date, "yyyy-MM-dd");
+  const DayWithFestival = (props: DayProps) => {
+    const dateStr = format(props.date, "yyyy-MM-dd");
     const dayFestivals = festivalsByDate.get(dateStr);
 
     return (
-      <div {...props} className="relative">
-        {props.children}
+      <div className="relative h-full w-full flex items-center justify-center">
+        <span>{props.date.getDate().toLocaleString('hi-IN')}</span>
         {dayFestivals && (
           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex space-x-0.5">
             {dayFestivals.slice(0, 3).map((_, index) => (
-                <div key={index} className="h-1 w-1 rounded-full bg-primary" />
+                <div key={index} className="h-1.5 w-1.5 rounded-full bg-primary" />
             ))}
           </div>
         )}
@@ -123,7 +124,7 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
                 </SelectTrigger>
                 <SelectContent>
                     {years.map(year => (
-                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                        <SelectItem key={year} value={year.toString()}>{year.toLocaleString('hi-IN')}</SelectItem>
                     ))}
                 </SelectContent>
             </Select>
@@ -144,16 +145,19 @@ export function MonthlyCalendar({ festivals }: MonthlyCalendarProps) {
             months: "p-0",
             month: "p-3",
             caption: "hidden",
-            head_cell: "w-10 sm:w-12 md:w-14",
-            cell: "h-12 sm:h-14 md:h-16 text-center text-sm p-0 relative",
+            head_cell: "w-10 sm:w-12 md:w-14 text-muted-foreground font-medium",
+            cell: "h-12 sm:h-14 md:h-16 text-center text-base p-0 relative",
             day: "h-full w-full p-1",
+            day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 rounded-md",
+            day_today: "bg-accent text-accent-foreground rounded-md",
         }}
         components={{
             Day: DayWithFestival
         }}
         footer={
-            <div className="p-3 border-t text-sm">
-                <strong>आज के त्यौहार:</strong> {festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}
+            <div className="p-3 border-t text-sm space-y-1">
+                <strong className="font-semibold">आज के त्यौहार:</strong> 
+                <p className="text-muted-foreground">{festivalsByDate.get(format(date, "yyyy-MM-dd"))?.join(", ") || "कोई नहीं"}</p>
             </div>
         }
       />

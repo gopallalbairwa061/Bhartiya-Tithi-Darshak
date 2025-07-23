@@ -11,20 +11,25 @@ import { MonthlyCalendar } from "./monthly-calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const festivals = [
-    { name: "दिवाली", date: "नवंबर 1, 2024", icon: "diya" },
-    { name: "होली", date: "मार्च 14, 2025", icon: "calendar" },
+    // 2024 Festivals (Existing + Additions)
     { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2024", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 19, 2024", icon: "calendar" },
     { name: "जन्माष्टमी", date: "अगस्त 26, 2024", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 7, 2024", icon: "calendar" },
+    { name: "गांधी जयंती", date: "अक्टूबर 2, 2024", icon: "calendar" },
     { name: "नवरात्रि", date: "अक्टूबर 3, 2024", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 12, 2024", icon: "calendar" },
-    { name: "रक्षा बंधन", date: "अगस्त 19, 2024", icon: "calendar" },
-    // 2025 Festivals
+    { name: "दिवाली", date: "नवंबर 1, 2024", icon: "diya" },
+    { name: "गुरु नानक जयंती", date: "नवंबर 15, 2024", icon: "calendar" },
+    { name: "क्रिसमस", date: "दिसंबर 25, 2024", icon: "calendar" },
+
+    // 2025 Festivals (Comprehensive List)
     { name: "मकर संक्रांति", date: "जनवरी 14, 2025", icon: "calendar" },
     { name: "गणतंत्र दिवस", date: "जनवरी 26, 2025", icon: "calendar" },
     { name: "वसंत पंचमी", date: "फरवरी 3, 2025", icon: "calendar" },
     { name: "महा शिवरात्रि", date: "फरवरी 26, 2025", icon: "calendar" },
     { name: "होलिका दहन", date: "मार्च 13, 2025", icon: "calendar" },
+    { name: "होली", date: "मार्च 14, 2025", icon: "calendar" },
     { name: "गुड़ी पड़वा", date: "मार्च 30, 2025", icon: "calendar" },
     { name: "राम नवमी", date: "अप्रैल 6, 2025", icon: "calendar" },
     { name: "हनुमान जयंती", date: "अप्रैल 20, 2025", icon: "calendar" },
@@ -35,9 +40,9 @@ const festivals = [
     { name: "गुरु पूर्णिमा", date: "जुलाई 11, 2025", icon: "calendar" },
     { name: "नाग पंचमी", date: "अगस्त 5, 2025", icon: "calendar" },
     { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2025", icon: "calendar" },
-    { name: "रक्षा बंधन", date: "अगस्त 9, 2025", icon: "calendar" },
-    { name: "जन्माष्टमी", date: "अगस्त 16, 2025", icon: "calendar" },
-    { name: "गणेश चतुर्थी", date: "अगस्त 28, 2025", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 19, 2025", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 26, 2025", icon: "calendar" },
+    { name: "गणेश चतुर्थी", date: "सितंबर 7, 2025", icon: "calendar" },
     { name: "ओणम", date: "सितंबर 7, 2025", icon: "calendar" },
     { name: "अनंत चतुर्दशी", date: "सितंबर 7, 2025", icon: "calendar" },
     { name: "नवरात्रि प्रारंभ", date: "सितंबर 22, 2025", icon: "calendar" },
