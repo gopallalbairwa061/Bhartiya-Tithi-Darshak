@@ -133,31 +133,31 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
        <div
         onClick={() => setSelectedDate(date)}
         className={cn(
-            "flex w-full border-b p-4 gap-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200",
-            isSelected && "bg-primary/20",
+            "flex w-full border-b border-border/50 p-4 gap-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200",
+            isSelected && "bg-primary/10",
             isSunday && !isSelected && "bg-destructive/5"
         )}
       >
         <div className="flex flex-col items-center justify-center w-24">
-            <span className={cn("text-5xl font-bold tracking-tighter", isSunday && "text-destructive")}>
+            <span className={cn("text-5xl font-bold tracking-tighter text-chart-1", isSunday && "text-destructive")}>
                 {dayNumber.toLocaleString('hi-IN')}
             </span>
             <span className="text-sm font-medium text-muted-foreground -mt-1">{format(date, 'cccc', { locale: hi })}</span>
         </div>
 
-        <div className="flex-grow space-y-1.5 text-sm">
+        <div className="flex-grow space-y-1.5 text-base">
              {isLoading ? (
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-4 w-2/3" />
+                <div className="space-y-2 py-1">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-5 w-1/2" />
+                    <Skeleton className="h-5 w-2/3" />
                 </div>
             ) : dayPanchang ? (
                 <>
-                   <p><strong className="font-semibold">तिथि:</strong> {dayPanchang.tithi}</p>
-                   <p><strong className="font-semibold">नक्षत्र:</strong> {dayPanchang.nakshatra.name} ({dayPanchang.nakshatra.endTime})</p>
+                   <p className="text-chart-2"><strong className="font-semibold text-foreground/80">तिथि:</strong> {dayPanchang.tithi}</p>
+                   <p className="text-chart-3"><strong className="font-semibold text-foreground/80">नक्षत्र:</strong> {dayPanchang.nakshatra.name} ({dayPanchang.nakshatra.endTime})</p>
                    {dayFestivals && dayFestivals.length > 0 && (
-                        <p className="font-bold text-primary">{dayFestivals.map(f => f.name).join(', ')}</p>
+                        <p className="font-bold text-chart-5">{dayFestivals.map(f => f.name).join(', ')}</p>
                     )}
                 </>
             ) : (
@@ -201,10 +201,26 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
         </Button>
       </div>
       
-      <div className="border rounded-md max-h-[calc(100vh-32rem)] min-h-[400px] overflow-y-auto">
-        {daysInMonth.map((day) => (
-            <DayWithDetails key={day.toISOString()} date={day} />
-        ))}
+      <div className="border border-border/50 rounded-md max-h-[calc(100vh-32rem)] min-h-[400px] overflow-y-auto">
+        {isLoading ? (
+            Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="flex w-full border-b border-border/50 p-4 gap-4">
+                    <div className="flex flex-col items-center justify-center w-24">
+                        <Skeleton className="h-12 w-16" />
+                        <Skeleton className="h-4 w-20 mt-2" />
+                    </div>
+                    <div className="flex-grow space-y-2 py-1">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-5 w-1/2" />
+                        <Skeleton className="h-5 w-2/3" />
+                    </div>
+                </div>
+            ))
+        ) : (
+            daysInMonth.map((day) => (
+                <DayWithDetails key={day.toISOString()} date={day} />
+            ))
+        )}
       </div>
     </div>
   );
