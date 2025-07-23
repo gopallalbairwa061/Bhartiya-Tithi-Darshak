@@ -9,6 +9,7 @@ import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { format, getYear, getMonth } from "date-fns";
 import { LoadingScreen } from "@/components/loading-screen";
 import { LogoIcon } from "@/components/icons/logo-icon";
+import { SubscribeBanner } from "@/components/subscribe-banner";
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -90,6 +91,7 @@ export default function Home() {
         <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
+      <SubscribeBanner />
     </div>
   );
 }
