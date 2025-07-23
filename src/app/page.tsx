@@ -271,7 +271,7 @@ export default function Home() {
                                 htmlFor="terms"
                                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
-                                मैं नियमों और शर्तों से सहमत हूँ।
+                                मैं <Link href="/terms" target="_blank" className="text-primary underline">नियमों और शर्तों</Link> से सहमत हूँ।
                             </label>
                         </div>
                         <Button onClick={loadOrGenerateQuiz} disabled={!acceptedTerms} className="w-full">
@@ -448,6 +448,7 @@ export default function Home() {
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50">
         <div className="flex justify-center items-center gap-4">
             <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
+            <Link href="/terms" className="hover:text-primary">नियम और शर्तें</Link>
         </div>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
@@ -455,7 +456,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-
-    
