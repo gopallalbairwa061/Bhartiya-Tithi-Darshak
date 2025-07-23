@@ -10,7 +10,7 @@ export default function Home() {
 
   useEffect(() => {
     const today = new Date();
-    const dateString = today.toLocaleDateString('en-GB', {
+    const dateString = today.toLocaleDateString('hi-IN', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -19,14 +19,14 @@ export default function Home() {
     setCurrentDate(dateString);
   }, []);
 
-  const vsDateString = "Vikram Samvat 2081"; // Mock data
+  const vsDateString = "विक्रम संवत २०८१";
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
       <main className="flex-grow container mx-auto px-4 py-8">
         <header className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-accent tracking-tight">
-            Bharatiya Tithi Darshak
+            भारतीय तिथि दर्शक
           </h1>
           <p className="text-lg md:text-xl text-primary mt-2 animate-fade-in">
             {currentDate ? `${currentDate} | ${vsDateString}` : <span className="inline-block h-6 w-64 bg-primary/20 rounded animate-pulse"></span>}
@@ -44,7 +44,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50 mt-8">
-        <p>&copy; {new Date().getFullYear()} Bharatiya Tithi Darshak. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
       </footer>
     </div>
   );

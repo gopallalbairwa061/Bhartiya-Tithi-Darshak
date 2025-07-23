@@ -8,17 +8,17 @@ import { Search, CalendarHeart } from "lucide-react";
 import { DiyaIcon } from "@/components/icons/diya-icon";
 
 const festivals = [
-    { name: "Diwali", date: "November 1, 2024", icon: "diya" },
-    { name: "Holi", date: "March 25, 2025", icon: "calendar" },
-    { name: "Independence Day", date: "August 15, 2024", icon: "calendar" },
-    { name: "Janmashtami", date: "August 26, 2024", icon: "calendar" },
-    { name: "Ganesh Chaturthi", date: "September 7, 2024", icon: "calendar" },
-    { name: "Navratri", date: "October 3, 2024", icon: "calendar" },
-    { name: "Dussehra", date: "October 12, 2024", icon: "calendar" },
-    { name: "Makar Sankranti", date: "January 14, 2025", icon: "calendar" },
-    { name: "Republic Day", date: "January 26, 2025", icon: "calendar" },
-    { name: "Maha Shivaratri", date: "February 26, 2025", icon: "calendar" },
-    { name: "Raksha Bandhan", date: "August 19, 2024", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 1, 2024", icon: "diya" },
+    { name: "होली", date: "मार्च 25, 2025", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2024", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 26, 2024", icon: "calendar" },
+    { name: "गणेश चतुर्थी", date: "सितंबर 7, 2024", icon: "calendar" },
+    { name: "नवरात्रि", date: "अक्टूबर 3, 2024", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 12, 2024", icon: "calendar" },
+    { name: "मकर संक्रांति", date: "जनवरी 14, 2025", icon: "calendar" },
+    { name: "गणतंत्र दिवस", date: "जनवरी 26, 2025", icon: "calendar" },
+    { name: "महा शिवरात्रि", date: "फरवरी 26, 2025", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 19, 2024", icon: "calendar" },
 ];
 
 export function FestivalSearch() {
@@ -41,13 +41,13 @@ export function FestivalSearch() {
   return (
     <Card className="w-full h-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">Festivals & Events</CardTitle>
+        <CardTitle className="font-headline text-2xl text-accent">त्योहार और कार्यक्रम</CardTitle>
         <div className="relative mt-2">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="search"
-              aria-label="Search for festivals or events"
-              placeholder="Search for a festival or event..."
+              aria-label="त्योहारों या कार्यक्रमों के लिए खोजें"
+              placeholder="त्योहार या कार्यक्रम खोजें..."
               className="pl-11 h-11 text-base"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -70,7 +70,7 @@ export function FestivalSearch() {
             ) : (
               <div className="flex flex-col items-center justify-center h-48 text-center">
                 <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground">No festivals found matching your search.</p>
+                <p className="text-muted-foreground">आपकी खोज से कोई त्योहार मेल नहीं खाता।</p>
               </div>
             )}
           </ul>

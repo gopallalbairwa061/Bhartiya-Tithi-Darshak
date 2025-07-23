@@ -4,22 +4,22 @@ import { Sun, Sunset } from "lucide-react";
 
 export function SunTimesCard() {
     const sunTimes = {
-        sunrise: "05:55 AM",
-        sunset: "07:15 PM",
-        location: "New Delhi, India"
+        sunrise: "सुबह 05:55",
+        sunset: "शाम 07:15",
+        location: "नई दिल्ली, भारत"
     }
 
   return (
     <Card className="w-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-accent">Sunrise & Sunset</CardTitle>
+        <CardTitle className="font-headline text-2xl text-accent">सूर्योदय और सूर्यास्त</CardTitle>
         <CardDescription>{sunTimes.location}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-5 text-lg">
         <div className="flex items-center gap-4">
           <Sun className="h-8 w-8 text-primary flex-shrink-0" />
           <div>
-            <p className="font-semibold">Sunrise</p>
+            <p className="font-semibold">सूर्योदय</p>
             <p className="text-muted-foreground text-base">{sunTimes.sunrise}</p>
           </div>
         </div>
@@ -27,7 +27,7 @@ export function SunTimesCard() {
         <div className="flex items-center gap-4">
           <Sunset className="h-8 w-8 text-primary flex-shrink-0" />
           <div>
-            <p className="font-semibold">Sunset</p>
+            <p className="font-semibold">सूर्यास्त</p>
             <p className="text-muted-foreground text-base">{sunTimes.sunset}</p>
           </div>
         </div>
