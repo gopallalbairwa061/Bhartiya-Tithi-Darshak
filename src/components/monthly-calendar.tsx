@@ -212,8 +212,8 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
             months: "p-0",
             month: "p-3",
             caption: "hidden",
-            head_cell: "w-12 sm:w-14 md:w-16 text-muted-foreground font-medium border-b",
-            cell: "h-24 sm:h-28 md:h-32 text-center text-sm p-0 relative border-b border-r",
+            head_cell: "w-12 sm:w-16 md:w-20 lg:w-24 text-muted-foreground font-medium border-b",
+            cell: "h-24 sm:h-28 md:h-32 lg:h-36 text-center text-sm p-0 relative border-b border-r",
             day: "h-full w-full p-1",
             day_selected: "bg-primary/20 text-primary-foreground rounded-md",
             day_today: "bg-accent/50 text-accent-foreground rounded-md",
@@ -247,5 +247,3 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
     </div>
   );
 }
-
-    
