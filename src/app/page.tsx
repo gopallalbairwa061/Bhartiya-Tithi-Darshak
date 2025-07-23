@@ -13,20 +13,23 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle2, XCircle, ChevronRight } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
-import { generateQuestions, evaluateAnswer, QuizQuestion } from "@/ai/flows/panchang-quiz-flow";
+import { generateQuestions, evaluateAnswer, QuizQuestion, EvaluateAnswerOutput } from "@/ai/flows/panchang-quiz-flow";
 import { WinnerDetailsForm, WinnerDetails } from "@/components/winner-details-form";
 import { handleQuizWinner } from "@/services/quiz-winner";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+
 
 const QUIZ_STORAGE_KEY = 'dailyQuiz';
 
 type DailyQuiz = {
   date: string; // YYYY-MM-DD
   questions: QuizQuestion[];
-  answers: (null | { userAnswer: string; isCorrect: boolean })[];
+  answers: (null | { userAnswer: string; result: EvaluateAnswerOutput })[];
   completed: boolean;
   submittedDetails: boolean;
   failed: boolean;
@@ -41,11 +44,11 @@ export default function Home() {
   const [initialLoad, setInitialLoad] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   
-  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'collect-details' | 'finished'>('idle');
+  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'review' | 'congratulations' | 'collect-details' | 'finished'>('idle');
   const [dailyQuiz, setDailyQuiz] = useState<DailyQuiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
-  const [quizResult, setQuizResult] = useState<{ isCorrect: boolean; summary: string } | null>(null);
+  const [quizResult, setQuizResult] = useState<EvaluateAnswerOutput | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -112,16 +115,13 @@ export default function Home() {
         const parsedQuiz: DailyQuiz = JSON.parse(storedQuiz);
         if (parsedQuiz.date === todayStr) {
             setDailyQuiz(parsedQuiz);
-            if (parsedQuiz.failed) {
-                setQuizState('finished');
-                return;
-            }
             const firstUnanswered = parsedQuiz.answers.findIndex(a => a === null);
             setCurrentQuestionIndex(firstUnanswered === -1 ? 0 : firstUnanswered);
-             if (parsedQuiz.completed && parsedQuiz.submittedDetails) {
+
+            if (parsedQuiz.completed && !parsedQuiz.failed) {
+                 setQuizState('review');
+            } else if (parsedQuiz.failed) {
                 setQuizState('finished');
-            } else if (parsedQuiz.completed) {
-                setQuizState('collect-details');
             } else {
                 setQuizState('question');
             }
@@ -162,7 +162,7 @@ export default function Home() {
       });
 
       const newAnswers = [...dailyQuiz.answers];
-      newAnswers[currentQuestionIndex] = { userAnswer, isCorrect: result.isCorrect };
+      newAnswers[currentQuestionIndex] = { userAnswer, result };
       let updatedQuiz = { ...dailyQuiz, answers: newAnswers };
 
       if (!result.isCorrect) {
@@ -172,10 +172,9 @@ export default function Home() {
           setQuizState('result');
       }
       
+      setQuizResult(result);
       setDailyQuiz(updatedQuiz);
       localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
-
-      setQuizResult(result);
 
     } catch (error) {
       console.error("Error evaluating answer:", error);
@@ -194,15 +193,27 @@ export default function Home() {
         const updatedQuiz = { ...dailyQuiz, completed: true };
         setDailyQuiz(updatedQuiz);
         localStorage.setItem(QUIZ_STORAGE_KEY, JSON.stringify(updatedQuiz));
-        
-        const allCorrect = updatedQuiz.answers.every(a => a?.isCorrect);
-        if(allCorrect) {
-            setQuizState('congratulations');
-        } else {
-            setQuizState('finished');
-        }
+        setQuizState('review');
     }
   };
+  
+  const handleProceedFromReview = () => {
+    if (!dailyQuiz) return;
+
+    if (dailyQuiz.submittedDetails) {
+        setQuizState('finished');
+        return;
+    }
+
+    const allCorrect = dailyQuiz.answers.every(a => a?.result.isCorrect);
+    if(allCorrect) {
+        setQuizState('congratulations');
+    } else {
+        // This case should ideally not be reached if failed state is set correctly
+        setQuizState('finished');
+    }
+  }
+
 
    const handleWinnerFormSubmit = async (data: WinnerDetails) => {
     console.log("Winner details:", data);
@@ -275,6 +286,44 @@ export default function Home() {
                     </Button>
                  </div>
             );
+
+        case 'review':
+          return (
+            <div className="flex flex-col gap-4 h-full">
+              <h2 className="text-xl font-bold text-center">क्विज़ की समीक्षा</h2>
+              <p className="text-sm text-muted-foreground text-center">यहाँ आपके उत्तरों का सारांश है।</p>
+              <ScrollArea className="flex-grow pr-4">
+                <Accordion type="single" collapsible className="w-full">
+                  {dailyQuiz?.questions.map((q, index) => {
+                    const answerInfo = dailyQuiz.answers[index];
+                    return (
+                      <AccordionItem value={`item-${index}`} key={index}>
+                        <AccordionTrigger>
+                          <div className="flex items-center gap-2">
+                            {answerInfo?.result.isCorrect ? (
+                              <CheckCircle2 className="h-5 w-5 text-green-500"/>
+                            ) : (
+                              <XCircle className="h-5 w-5 text-red-500"/>
+                            )}
+                            <span className="font-semibold text-left">प्रश्न {index + 1}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-3">
+                          <p className="font-semibold">{q.question}</p>
+                          <p><strong>आपका उत्तर:</strong> {answerInfo?.userAnswer || "No answer"}</p>
+                          {!answerInfo?.result.isCorrect && <p><strong>सही उत्तर:</strong> {q.answer}</p>}
+                          <p className="text-sm text-muted-foreground p-2 bg-muted/50 rounded-md">{answerInfo?.result.summary}</p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
+              </ScrollArea>
+              <Button onClick={handleProceedFromReview} className="w-full mt-4">
+                आगे बढ़ें <ChevronRight className="ml-2 h-4 w-4"/>
+              </Button>
+            </div>
+          );
             
         case 'congratulations':
             return (
@@ -303,7 +352,7 @@ export default function Home() {
                     <div className="w-full flex flex-col gap-2">
                       <Button onClick={resetQuiz} className="w-full">
                         <RefreshCw className="mr-2 h-4 w-4"/>
-                        {isFailure ? "पुनः प्रयास करें" : "पुनः प्रश्नोत्तरी खेलें"}
+                        {"पुनः प्रश्नोत्तरी खेलें"}
                       </Button>
                       <Button onClick={() => setIsQuizOpen(false)} variant="outline" className="w-full">
                           <HomeIcon className="mr-2 h-4 w-4"/>
@@ -388,5 +437,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
