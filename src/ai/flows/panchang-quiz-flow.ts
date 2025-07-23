@@ -86,7 +86,7 @@ const evaluateAnswerPrompt = ai.definePrompt({
     Correct Answer: {{{answer}}}
     User's Answer: {{{userAnswer}}}
     
-    First, determine if the user's answer is correct. The user's answer may be slightly different but still convey the correct meaning. Be lenient.
+    First, determine if the user's answer is correct. The user's answer may be slightly different but still convey the correct meaning. Be very lenient and forgiving with spelling, grammar, and phrasing. If the user's answer is semantically close to the correct answer, consider it correct. For example, if the correct answer is "नई दिल्ली" and the user says "दिल्ली", it should be marked as correct.
     
     Second, regardless of whether the answer is correct or not, provide a brief, interesting summary or explanation of the correct answer in a few words. This summary should be in clear and concise Hindi.
 
