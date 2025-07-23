@@ -11,6 +11,7 @@ import { format, getYear, getMonth } from "date-fns";
 import { LoadingScreen } from "@/components/loading-screen";
 import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   const [currentDateTime, setCurrentDateTime] = useState("");
@@ -66,7 +67,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
       <main className="flex-grow container mx-auto px-4 py-8 pb-32">
-        <header className="text-center mb-12">
+        <header className="text-center mb-12 relative">
             <div className="flex justify-center items-center gap-4 mb-4">
                 <LogoIcon className="h-16 w-16" />
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-headline font-bold text-transparent bg-clip-text bg-gradient-to-r from-chart-1 via-chart-2 to-chart-3">
@@ -76,6 +77,9 @@ export default function Home() {
           <p className="text-lg md:text-xl text-muted-foreground mt-2 animate-fade-in">
             {currentDateTime ? `${currentDateTime} | ${vsDateString}` : <span className="inline-block h-6 w-96 bg-primary/20 rounded animate-pulse"></span>}
           </p>
+          <div className="absolute top-0 right-0">
+            <ThemeToggle />
+          </div>
         </header>
         
         <div className="max-w-md mx-auto w-full mb-8">
