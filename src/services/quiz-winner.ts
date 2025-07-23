@@ -34,7 +34,7 @@ export async function handleQuizWinner(details: WinnerDetails): Promise<{ succes
     });
 
     await transporter.sendMail({
-      from: `"भारतीय तिथि दर्शक" <${process.env.SMTP_USER}>`, // sender address
+      from: `"भारतीय तिथि दर्शक" <onboarding@resend.dev>`, // sender address
       to: 'myselfmk061@gmail.com', // list of receivers
       subject: `🎉 भारतीय तिथि दर्शक पर नए प्रश्नोत्तरी विजेता! (New Quiz Winner!)`,
       html: `
