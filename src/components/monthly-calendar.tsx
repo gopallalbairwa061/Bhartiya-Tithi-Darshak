@@ -140,6 +140,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
                 </div>
 
                 <div className="flex-grow flex flex-col items-center justify-center">
+                    <span className="text-xs text-muted-foreground">{format(props.date, 'cccc', { locale: hi })}</span>
                     <span className={cn("text-3xl lg:text-4xl font-bold", isSunday && "text-destructive")}>{dayNumber.toLocaleString('hi-IN')}</span>
                      {dayFestivals && dayFestivals.map(f => (
                         <span key={f.name} className="mt-1 text-[10px] font-semibold text-destructive leading-tight tracking-tighter text-center">
@@ -174,7 +175,7 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
   };
 
   const formatWeekdayName = (day: Date) => {
-    return format(day, 'cccc', { locale: hi });
+    return format(day, 'E', { locale: hi });
   };
 
 
@@ -223,13 +224,14 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
             months: "p-0",
             month: "p-3",
             caption: "hidden",
+            head_row: "hidden",
             head_cell: "w-full text-muted-foreground font-medium",
-            cell: "h-36 text-center text-sm p-0 relative",
+            cell: "h-36 text-center text-sm p-0 relative border-t first:border-l",
+            row: "flex w-full border-r",
             day: "h-full w-full p-0",
             day_selected: "bg-primary/20 text-primary-foreground rounded-none",
             day_today: "bg-accent/50 text-accent-foreground rounded-none",
             day_outside: "text-muted-foreground/50 bg-background/50",
-            head_row: "",
         }}
         components={{
             Day: DayWithDetails
@@ -258,3 +260,5 @@ export function MonthlyCalendar({ festivals, onDateSelect }: MonthlyCalendarProp
     </div>
   );
 }
+
+    
