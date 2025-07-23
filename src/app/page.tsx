@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PanchangCard } from "@/components/panchang-card";
+import { PanchangDetailCard } from "@/components/panchang-detail-card";
 import { FestivalSearch } from "@/components/festival-search";
 import { SunTimesCard } from "@/components/sun-times-card";
 import { ChaughadiyaCard } from "@/components/chaughadiya-card";
@@ -36,8 +36,6 @@ export default function Home() {
       try {
         const year = getYear(selectedDate);
         const month = getMonth(selectedDate);
-        // We fetch the whole month, but only need one day.
-        // A more optimized API would fetch just one day's panchang.
         const monthData = await getPanchangForMonth(year, month);
         const dayPanchang = monthData.find(p => p.date === format(selectedDate, "yyyy-MM-dd"));
         setSelectedPanchang(dayPanchang || null);
@@ -52,7 +50,7 @@ export default function Home() {
   }, [selectedDate]);
 
 
-  const vsDateString = "विक्रम संवत २०८१";
+  const vsDateString = selectedPanchang ? `${selectedPanchang.masa}, ${selectedPanchang.samvat}` : "विक्रम संवत २०८१";
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body">
@@ -71,7 +69,7 @@ export default function Home() {
             <FestivalSearch onDateSelect={setSelectedDate} />
           </div>
           <div className="xl:col-span-1 flex flex-col gap-8">
-            <PanchangCard panchang={selectedPanchang} isLoading={isLoading} />
+            <PanchangDetailCard panchang={selectedPanchang} isLoading={isLoading} />
             <SunTimesCard panchang={selectedPanchang} isLoading={isLoading} />
             <ChaughadiyaCard title="दिन का चौघड़िया" />
             <ChaughadiyaCard title="रात का चौघड़िया" />
