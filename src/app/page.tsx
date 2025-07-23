@@ -13,7 +13,7 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, XCircle } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, XCircle, ShieldQuestion, FileText } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
@@ -21,7 +21,7 @@ import { generateQuestions, evaluateAnswer, QuizQuestion, EvaluateAnswerOutput }
 import { WinnerDetailsForm, WinnerDetails } from "@/components/winner-details-form";
 import { handleQuizWinner } from "@/services/quiz-winner";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SecureWrapper } from "@/components/secure-wrapper";
 
 
@@ -45,11 +45,12 @@ export default function Home() {
   const [initialLoad, setInitialLoad] = useState(true);
   const [isQuizOpen, setIsQuizOpen] = useState(false);
   
-  const [quizState, setQuizState] = useState<'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'collect-details' | 'finished'>('idle');
+  const [quizState, setQuizState] = useState<'instructions' | 'idle' | 'loading' | 'question' | 'evaluating' | 'result' | 'congratulations' | 'collect-details' | 'finished'>('instructions');
   const [dailyQuiz, setDailyQuiz] = useState<DailyQuiz | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
   const [quizResult, setQuizResult] = useState<EvaluateAnswerOutput | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -91,10 +92,12 @@ export default function Home() {
 
   // Load or generate quiz on open
   useEffect(() => {
-    if (isQuizOpen && quizState === 'idle') {
-      loadOrGenerateQuiz();
+    // Reset to instructions when sheet is closed
+    if (!isQuizOpen) {
+      setQuizState('instructions');
+      setAcceptedTerms(false);
     }
-  }, [isQuizOpen, quizState]);
+  }, [isQuizOpen]);
   
   // Auto-advance after 5 seconds on the result screen
   useEffect(() => {
@@ -234,8 +237,8 @@ export default function Home() {
       setCurrentQuestionIndex(0);
       setUserAnswer("");
       setQuizResult(null);
-      setQuizState('idle');
-      loadOrGenerateQuiz();
+      setAcceptedTerms(false);
+      setQuizState('instructions');
   }
   
   const currentQuestion = dailyQuiz?.questions[currentQuestionIndex];
@@ -247,6 +250,36 @@ export default function Home() {
 
   const renderQuizContent = () => {
     switch (quizState) {
+        case 'instructions':
+            return (
+                <div className="flex flex-col h-full gap-6 text-center">
+                    <div className="flex-grow flex flex-col items-center justify-center gap-4">
+                        <ShieldQuestion className="h-24 w-24 text-primary" />
+                        <h2 className="text-2xl font-bold">प्रश्नोत्तरी के नियम</h2>
+                        <ul className="text-muted-foreground list-disc list-inside text-left space-y-2">
+                            <li>आपको 10 प्रश्नों के उत्तर देने होंगे।</li>
+                            <li>सभी प्रश्नों के सही उत्तर देने पर आप पुरस्कार जीत सकते हैं।</li>
+                            <li>कृपया उत्तर कहीं और से खोजने का प्रयास न करें।</li>
+                            <li>ईमानदारी से खेलें और अपने ज्ञान का परीक्षण करें।</li>
+                        </ul>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="flex items-center space-x-2 justify-center">
+                            <Checkbox id="terms" checked={acceptedTerms} onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)} />
+                            <label
+                                htmlFor="terms"
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                                मैं नियमों और शर्तों से सहमत हूँ।
+                            </label>
+                        </div>
+                        <Button onClick={loadOrGenerateQuiz} disabled={!acceptedTerms} className="w-full">
+                            प्रश्नोत्तरी शुरू करें
+                        </Button>
+                    </div>
+                </div>
+            );
+
         case 'loading':
             return <div className="flex justify-center items-center h-full"><p>प्रश्नोत्तरी लोड हो रही है...</p></div>;
         
@@ -419,3 +452,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
