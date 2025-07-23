@@ -2,6 +2,9 @@
 'use server';
 
 import { z } from 'zod';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const WinnerDetailsSchema = z.object({
   name: z.string().min(2, 'कम से कम 2 अक्षर का नाम आवश्यक है।'),
@@ -19,21 +22,30 @@ export async function handleQuizWinner(details: WinnerDetails): Promise<{ succes
       return { success: false, message: "अमान्य डेटा।" };
     }
 
-    console.log("---------- NEW QUIZ WINNER ----------");
-    console.log("Name:   ", validation.data.name);
-    console.log("Email:  ", validation.data.email);
-    console.log("UPI ID: ", validation.data.upiId);
-    console.log("-------------------------------------");
+    const { name, email, upiId } = validation.data;
 
-    // In a real application, you would integrate an email service here.
-    // Example:
-    // await sendEmail({
-    //   to: 'myselfmk061@gmail.com',
-    //   subject: 'New Quiz Winner!',
-    //   body: `Name: ${validation.data.name}\nEmail: ${validation.data.email}\nUPI ID: ${validation.data.upiId}`
-    // });
-    
-    // Simulating success
+    await resend.emails.send({
+      from: 'onboarding@resend.dev',
+      to: 'myselfmk061@gmail.com',
+      subject: 'New Quiz Winner on Bharatiya Tithi Darshak!',
+      html: `
+        <h1>New Quiz Winner!</h1>
+        <p>A user has scored 10/10 on the daily quiz.</p>
+        <h2>Winner Details:</h2>
+        <ul>
+          <li><strong>Name:</strong> ${name}</li>
+          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>UPI ID:</strong> ${upiId}</li>
+        </ul>
+      `
+    });
+
+    console.log("---------- NEW QUIZ WINNER (Email Sent) ----------");
+    console.log("Name:   ", name);
+    console.log("Email:  ", email);
+    console.log("UPI ID: ", upiId);
+    console.log("-------------------------------------------------");
+
     return { success: true, message: "विवरण सफलतापूर्वक भेजा गया।" };
 
   } catch (error) {
@@ -41,5 +53,3 @@ export async function handleQuizWinner(details: WinnerDetails): Promise<{ succes
     return { success: false, message: "विवरण भेजने में विफल।" };
   }
 }
-
-    
