@@ -12,7 +12,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Year and month parameters are required' }, { status: 400 });
     }
 
-    const panchangData = await getPanchangData(parseInt(year, 10), parseInt(month, 10), { fromApi: true });
+    // API receives month as 1-12, but service expects 0-11
+    const panchangData = await getPanchangData(parseInt(year, 10), parseInt(month, 10) - 1, { fromApi: true });
     
     return NextResponse.json(panchangData);
   } catch (error) {
