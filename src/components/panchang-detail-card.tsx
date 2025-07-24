@@ -1,13 +1,16 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PanchangData } from "@/services/panchang";
-import { Sun, Moon, Star, Link as LinkIcon, CalendarDays, AlertTriangle, Shield, ShieldAlert, ShieldCheck } from "lucide-react";
+import { Sun, Moon, Star, Link as LinkIcon, CalendarDays, AlertTriangle, Shield, ShieldAlert, ShieldCheck, Calendar, Sparkles, UserCircle } from "lucide-react";
 import { Badge } from "./ui/badge";
+import { isToday, format } from "date-fns";
+import { hi } from "date-fns/locale";
 
 interface PanchangDetailCardProps {
   panchang: PanchangData | null;
   isLoading: boolean;
+  selectedDate: Date;
 }
 
 const DetailRow = ({ icon, label, value, isLoading }: { icon: React.ReactNode; label: string; value?: string; isLoading: boolean }) => (
@@ -54,14 +57,22 @@ const MuhuratRow = ({ icon, label, value, isLoading, type }: { icon: React.React
 }
 
 
-export function PanchangDetailCard({ panchang, isLoading }: PanchangDetailCardProps) {
+export function PanchangDetailCard({ panchang, isLoading, selectedDate }: PanchangDetailCardProps) {
+  
+  const cardTitle = isToday(selectedDate) ? "आज का पंचांग" : "पंचांग विवरण";
+  const cardDescription = format(selectedDate, "eeee, d MMMM yyyy", { locale: hi });
+
   return (
     <Card className="w-full shadow-lg">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl text-primary">आज का पंचांग</CardTitle>
+        <CardTitle className="font-headline text-2xl text-primary">{cardTitle}</CardTitle>
+        <CardDescription>{cardDescription}</CardDescription>
       </CardHeader>
       <CardContent className="divide-y divide-border/50 -mt-2">
+        <DetailRow icon={<Calendar size={20} />} label="मास" value={panchang?.masa} isLoading={isLoading} />
+        <DetailRow icon={<Sparkles size={20} />} label="संवत" value={panchang?.samvat} isLoading={isLoading} />
         <DetailRow icon={<Moon size={20} />} label="तिथि" value={panchang?.tithi} isLoading={isLoading} />
+        <DetailRow icon={<UserCircle size={20} />} label="राशि" value={panchang?.rashi} isLoading={isLoading} />
         <DetailRow icon={<Star size={20} />} label="नक्षत्र" value={panchang ? `${panchang.nakshatra.name} (${panchang.nakshatra.endTime})` : undefined} isLoading={isLoading} />
         <DetailRow icon={<LinkIcon size={20} />} label="योग" value={panchang ? `${panchang.yoga.name} (${panchang.yoga.endTime})` : undefined} isLoading={isLoading} />
         <DetailRow icon={<CalendarDays size={20} />} label="करण" value={panchang ? `${panchang.karana.name} (${panchang.karana.endTime})` : undefined} isLoading={isLoading} />

@@ -431,7 +431,7 @@ export default function Home() {
         </header>
         
         <div className="max-w-md mx-auto w-full mb-8">
-            <PanchangDetailCard panchang={selectedPanchang} isLoading={isLoading} />
+            <PanchangDetailCard panchang={selectedPanchang} isLoading={isLoading} selectedDate={selectedDate} />
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
