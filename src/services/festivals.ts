@@ -43,7 +43,10 @@ const allFestivals: Festival[] = [
     { name: "गांधी जयंती", date: "अक्टूबर 2, 2024", icon: "calendar" },
     { name: "नवरात्रि", date: "अक्टूबर 3, 2024", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 12, 2024", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 20, 2024", icon: "calendar" },
+    { name: "अहोई अष्टमी", date: "अक्टूबर 24, 2024", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 1, 2024", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 12, 2024", icon: "calendar" },
     { name: "गुरु नानक जयंती", date: "नवंबर 15, 2024", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2024", icon: "calendar" },
 
@@ -75,6 +78,7 @@ const allFestivals: Festival[] = [
     { name: "दशहरा", date: "अक्टूबर 1, 2025", icon: "calendar" },
     { name: "शरद पूर्णिमा", date: "अक्टूबर 6, 2025", icon: "calendar" },
     { name: "करवा चौथ", date: "अक्टूबर 10, 2025", icon: "calendar" },
+    { name: "अहोई अष्टमी", date: "अक्टूबर 10, 2025", icon: "calendar" },
     { name: "धनतेरस", date: "अक्टूबर 20, 2025", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 21, 2025", icon: "diya" },
     { name: "गोवर्धन पूजा", date: "अक्टूबर 22, 2025", icon: "calendar" },
@@ -97,7 +101,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "सितंबर 2, 2030", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 20, 2030", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 8, 2030", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 17, 2030", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 27, 2030", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 19, 2030", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2030", icon: "calendar" },
     
     // 2031 Festivals
@@ -113,7 +119,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 22, 2031", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 9, 2031", icon: "calendar" },
     { name: "दशहरा", date: "सितंबर 27, 2031", icon: "calendar" },
+    { name: "करवा चौथ", date: "नवंबर 5, 2031", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 15, 2031", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 25, 2031", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2031", icon: "calendar" },
     
     // 2032 Festivals
@@ -129,7 +137,9 @@ const allFestivals: Festival[] = [
     { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2032", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "अगस्त 28, 2032", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 15, 2032", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 25, 2032", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 3, 2032", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 13, 2032", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2032", icon: "calendar" },
     
     // 2033 Festivals
@@ -145,7 +155,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 30, 2033", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 16, 2033", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 4, 2033", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 14, 2033", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 23, 2033", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 3, 2033", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2033", icon: "calendar" },
     
     // 2034 Festivals
@@ -161,7 +173,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 18, 2034", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 5, 2034", icon: "calendar" },
     { name: "दशहरा", date: "सितंबर 23, 2034", icon: "calendar" },
+    { name: "करवा चौथ", date: "नवंबर 2, 2034", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 11, 2034", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 22, 2034", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2034", icon: "calendar" },
     
     // 2035 Festivals
@@ -177,7 +191,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "सितंबर 7, 2035", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 25, 2035", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 12, 2035", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 22, 2035", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 31, 2035", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 11, 2035", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2035", icon: "calendar" },
     
     // 2036 Festivals
@@ -193,7 +209,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 26, 2036", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 13, 2036", icon: "calendar" },
     { name: "दशहरा", date: "सितंबर 30, 2036", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 10, 2036", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 18, 2036", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "अक्टूबर 30, 2036", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2036", icon: "calendar" },
     
     // 2037 Festivals
@@ -209,7 +227,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 16, 2037", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 2, 2037", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 19, 2037", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 29, 2037", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 7, 2037", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 18, 2037", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2037", icon: "calendar" },
     
     // 2038 Festivals
@@ -225,7 +245,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "सितंबर 3, 2038", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 22, 2038", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 8, 2038", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 18, 2038", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 27, 2038", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 7, 2038", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2038", icon: "calendar" },
     
     // 2039 Festivals
@@ -241,7 +263,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 24, 2039", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 10, 2039", icon: "calendar" },
     { name: "दशहरा", date: "सितंबर 26, 2039", icon: "calendar" },
+    { name: "करवा चौथ", date: "नवंबर 6, 2039", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 15, 2039", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 26, 2039", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2039", icon: "calendar" },
     
     // 2040 Festivals
@@ -257,7 +281,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 11, 2040", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "अगस्त 30, 2040", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 14, 2040", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 26, 2040", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 2, 2040", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 14, 2040", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2040", icon: "calendar" },
     
     // 2041 Festivals
@@ -273,7 +299,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 31, 2041", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 18, 2041", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 4, 2041", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 15, 2041", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 23, 2041", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 4, 2041", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2041", icon: "calendar" },
     
     // 2042 Festivals
@@ -289,7 +317,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 20, 2042", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 7, 2042", icon: "calendar" },
     { name: "दशहरा", date: "सितंबर 23, 2042", icon: "calendar" },
+    { name: "करवा चौथ", date: "नवंबर 3, 2042", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 11, 2042", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 23, 2042", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2042", icon: "calendar" },
     
     // 2043 Festivals
@@ -305,7 +335,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "सितंबर 8, 2043", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 27, 2043", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 13, 2043", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 23, 2043", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 1, 2043", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 12, 2043", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2043", icon: "calendar" },
     
     // 2044 Festivals
@@ -321,7 +353,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 27, 2044", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 15, 2044", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 1, 2044", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 11, 2044", icon: "calendar" },
     { name: "दिवाली", date: "अक्टूबर 20, 2044", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 1, 2044", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2044", icon: "calendar" },
     
     // 2045 Festivals
@@ -337,7 +371,9 @@ const allFestivals: Festival[] = [
     { name: "जन्माष्टमी", date: "अगस्त 17, 2045", icon: "calendar" },
     { name: "गणेश चतुर्थी", date: "सितंबर 4, 2045", icon: "calendar" },
     { name: "दशहरा", date: "अक्टूबर 20, 2045", icon: "calendar" },
+    { name: "करवा चौथ", date: "अक्टूबर 31, 2045", icon: "calendar" },
     { name: "दिवाली", date: "नवंबर 8, 2045", icon: "diya" },
+    { name: "देवउठनी एकादशी", date: "नवंबर 20, 2045", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2045", icon: "calendar" },
 ];
 
