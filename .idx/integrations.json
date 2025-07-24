@@ -1,0 +1,6 @@
+{
+  "firebase_hosting": {
+    "deploymentHostingUrl": "https://bharatiya-tithi-darshak.web.app"
+  },
+  "cloud_run_deploy": {}
+}
