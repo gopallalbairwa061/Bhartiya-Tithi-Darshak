@@ -11,6 +11,7 @@ import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Festival } from "@/services/festivals";
+import { parseHindiDate } from "@/lib/date-utils";
 import { CalendarHeart, Star, Moon } from "lucide-react";
 import { DiyaIcon } from "./icons/diya-icon";
 
@@ -21,32 +22,6 @@ interface MonthlyCalendarProps {
   onMonthChange: (date: Date) => void;
   currentMonth: Date;
 }
-
-// This was moved from festivals.ts to avoid the server action error
-const parseHindiDate = (dateString: string): Date | null => {
-  const monthMap: { [key: string]: number } = {
-    'जनवरी': 0, 'फरवरी': 1, 'मार्च': 2, 'अप्रैल': 3, 'मई': 4, 'जून': 5,
-    'जुलाई': 6, 'अगस्त': 7, 'सितंबर': 8, 'अक्टूबर': 9, 'नवंबर': 10, 'दिसंबर': 11
-  };
-  const parts = dateString.replace(/,/g, '').split(' ');
-  if (parts.length === 3) {
-    const monthName = parts[0];
-    const day = parseInt(parts[1], 10);
-    const year = parseInt(parts[2], 10);
-    
-    const month = monthMap[monthName];
-    if (month !== undefined && !isNaN(day) && !isNaN(year)) {
-      return new Date(year, month, day);
-    }
-  }
-  // Fallback for standard date strings
-  const parsedDate = new Date(dateString);
-  if (!isNaN(parsedDate.getTime())) {
-    return parsedDate;
-  }
-  return null;
-};
-
 
 export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, currentMonth }: MonthlyCalendarProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -261,3 +236,5 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
     </div>
   );
 }
+
+    

@@ -46,7 +46,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
     const fetchYearlyFestivals = async () => {
         setIsYearlyLoading(true);
         try {
-            const year = getYear(new Date());
+            const year = getYear(currentDate);
             const festivals = await getFestivalsForYear(year);
             setYearlyFestivals(festivals);
         } catch (error) {
@@ -57,7 +57,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
         }
     };
     fetchYearlyFestivals();
-  }, []);
+  }, [currentDate]);
 
 
   const filteredFestivals = useMemo(() => {
