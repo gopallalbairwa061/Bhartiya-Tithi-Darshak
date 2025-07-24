@@ -353,3 +353,16 @@ export async function getFestivalsForMonth(year: number, month: number): Promise
         return false;
     });
 }
+
+export async function getFestivalsForYear(year: number): Promise<Festival[]> {
+    // Simulate async operation
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    return allFestivals.filter(festival => {
+        const festivalDate = parseHindiDate(festival.date);
+        if (festivalDate) {
+            return getYear(festivalDate) === year;
+        }
+        return false;
+    });
+}

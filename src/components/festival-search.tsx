@@ -9,8 +9,8 @@ import { Search, CalendarHeart } from "lucide-react";
 import { DiyaIcon } from "@/components/icons/diya-icon";
 import { MonthlyCalendar } from "./monthly-calendar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getFestivalsForMonth, Festival } from "@/services/festivals";
-import { getYear, getMonth } from "date-fns";
+import { getFestivalsForMonth, getFestivalsForYear, Festival } from "@/services/festivals";
+import { getYear, getMonth, format } from "date-fns";
 
 interface FestivalSearchProps {
   onDateSelect: (date: Date) => void;
@@ -19,34 +19,53 @@ interface FestivalSearchProps {
 export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [festivals, setFestivals] = useState<Festival[]>([]);
+  const [monthlyFestivals, setMonthlyFestivals] = useState<Festival[]>([]);
+  const [yearlyFestivals, setYearlyFestivals] = useState<Festival[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isYearlyLoading, setIsYearlyLoading] = useState(true);
 
   useEffect(() => {
-    const fetchFestivals = async () => {
+    const fetchMonthlyFestivals = async () => {
         setIsLoading(true);
         try {
             const year = getYear(currentDate);
             const month = getMonth(currentDate);
-            const monthFestivals = await getFestivalsForMonth(year, month);
-            setFestivals(monthFestivals);
+            const festivals = await getFestivalsForMonth(year, month);
+            setMonthlyFestivals(festivals);
         } catch (error) {
-            console.error("Failed to fetch festivals:", error);
-            setFestivals([]);
+            console.error("Failed to fetch monthly festivals:", error);
+            setMonthlyFestivals([]);
         } finally {
             setIsLoading(false);
         }
     };
-    fetchFestivals();
+    fetchMonthlyFestivals();
   }, [currentDate]);
+
+  useEffect(() => {
+    const fetchYearlyFestivals = async () => {
+        setIsYearlyLoading(true);
+        try {
+            const year = getYear(new Date());
+            const festivals = await getFestivalsForYear(year);
+            setYearlyFestivals(festivals);
+        } catch (error) {
+            console.error("Failed to fetch yearly festivals:", error);
+            setYearlyFestivals([]);
+        } finally {
+            setIsYearlyLoading(false);
+        }
+    };
+    fetchYearlyFestivals();
+  }, []);
 
 
   const filteredFestivals = useMemo(() => {
-    if (!searchTerm) return festivals;
-    return festivals.filter((festival) =>
+    if (!searchTerm) return yearlyFestivals;
+    return yearlyFestivals.filter((festival) =>
       festival.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm, festivals]);
+  }, [searchTerm, yearlyFestivals]);
   
   const getIcon = (iconName: string) => {
     if (iconName === "diya") {
@@ -68,7 +87,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
           </TabsList>
           <TabsContent value="calendar" className="mt-4">
             <MonthlyCalendar 
-              festivals={festivals} 
+              festivals={monthlyFestivals} 
               onDateSelect={onDateSelect} 
               onMonthChange={setCurrentDate}
               currentMonth={currentDate}
@@ -88,7 +107,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
             </div>
             <ScrollArea className="h-[calc(100vh-32rem)] min-h-[400px] pr-4 mt-4">
               <ul className="space-y-4">
-                {isLoading ? (
+                {isYearlyLoading ? (
                     <div className="flex flex-col items-center justify-center h-48 text-center">
                         <p className="text-muted-foreground">त्योहार लोड हो रहे हैं...</p>
                     </div>
@@ -105,7 +124,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
                 ) : (
                   <div className="flex flex-col items-center justify-center h-48 text-center">
                     <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                    <p className="text-muted-foreground">इस महीने कोई त्यौहार नहीं मिला।</p>
+                    <p className="text-muted-foreground">इस वर्ष कोई त्यौहार नहीं मिला।</p>
                   </div>
                 )}
               </ul>
