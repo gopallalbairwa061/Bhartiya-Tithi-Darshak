@@ -13,7 +13,7 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, KeyRound, ShieldQuestion, FileText, Info } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, KeyRound, ShieldQuestion, FileText, Info, Wrench } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ApiKeyManager } from "@/components/api-key-manager";
@@ -26,6 +26,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SecureWrapper } from "@/components/secure-wrapper";
 import Link from 'next/link';
+import { useToast } from "@/hooks/use-toast";
 
 
 const QUIZ_STORAGE_KEY = 'dailyQuiz';
@@ -54,6 +55,7 @@ export default function Home() {
   const [userAnswer, setUserAnswer] = useState("");
   const [quizResult, setQuizResult] = useState<EvaluateAnswerOutput | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -242,6 +244,17 @@ export default function Home() {
       setQuizResult(null);
       setAcceptedTerms(false);
       setQuizState('instructions');
+  }
+
+  const handleFixData = () => {
+    toast({
+        title: "डेटा रीसेट किया जा रहा है...",
+        description: "स्थानीय डेटा साफ़ किया जा रहा है और एप्लिकेशन पुनः लोड हो रहा है।",
+    });
+    localStorage.clear();
+    setTimeout(() => {
+        window.location.reload();
+    }, 1500);
   }
   
   const currentQuestion = dailyQuiz?.questions[currentQuestionIndex];
@@ -448,7 +461,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="container mx-auto px-4 py-6 text-center text-muted-foreground border-t border-border/50">
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-4 flex-wrap">
             <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
             <Link href="/terms" className="hover:text-primary">नियम और शर्तें</Link>
              <Dialog>
@@ -467,10 +480,15 @@ export default function Home() {
                     <ApiKeyManager />
                 </DialogContent>
             </Dialog>
+             <Button variant="link" className="text-muted-foreground hover:text-primary p-0 h-auto" onClick={handleFixData}>
+                <Wrench className="mr-2 h-4 w-4" />
+                डेटा ठीक करें
+            </Button>
         </div>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
       <SubscribeBanner />
     </div>
   );
-}
+
+    
