@@ -83,6 +83,150 @@ const allFestivals: Festival[] = [
     { name: "देवउठनी एकादशी", date: "नवंबर 2, 2025", icon: "calendar" },
     { name: "गुरु नानक जयंती", date: "नवंबर 5, 2025", icon: "calendar" },
     { name: "क्रिसमस", date: "दिसंबर 25, 2025", icon: "calendar" },
+    
+    // 2030 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2030", icon: "calendar" },
+    { name: "होली", date: "मार्च 3, 2030", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2030", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 22, 2030", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "सितंबर 2, 2030", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 8, 2030", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 27, 2030", icon: "diya" },
+    
+    // 2031 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2031", icon: "calendar" },
+    { name: "होली", date: "मार्च 21, 2031", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2031", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 11, 2031", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 22, 2031", icon: "calendar" },
+    { name: "दशहरा", date: "सितंबर 27, 2031", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 15, 2031", icon: "diya" },
+    
+    // 2032 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2032", icon: "calendar" },
+    { name: "होली", date: "मार्च 10, 2032", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2032", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "जुलाई 30, 2032", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 10, 2032", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 15, 2032", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 3, 2032", icon: "diya" },
+    
+    // 2033 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2033", icon: "calendar" },
+    { name: "होली", date: "फरवरी 27, 2033", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2033", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 18, 2033", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 30, 2033", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 4, 2033", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 23, 2033", icon: "diya" },
+    
+    // 2034 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2034", icon: "calendar" },
+    { name: "होली", date: "मार्च 18, 2034", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2034", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 7, 2034", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 18, 2034", icon: "calendar" },
+    { name: "दशहरा", date: "सितंबर 23, 2034", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 11, 2034", icon: "diya" },
+    
+    // 2035 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2035", icon: "calendar" },
+    { name: "होली", date: "मार्च 7, 2035", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2035", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 27, 2035", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "सितंबर 7, 2035", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 12, 2035", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 31, 2035", icon: "diya" },
+    
+    // 2036 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2036", icon: "calendar" },
+    { name: "होली", date: "मार्च 25, 2036", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2036", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 15, 2036", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 26, 2036", icon: "calendar" },
+    { name: "दशहरा", date: "सितंबर 30, 2036", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 18, 2036", icon: "diya" },
+    
+    // 2037 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2037", icon: "calendar" },
+    { name: "होली", date: "मार्च 15, 2037", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2037", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 4, 2037", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 16, 2037", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 19, 2037", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 7, 2037", icon: "diya" },
+    
+    // 2038 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2038", icon: "calendar" },
+    { name: "होली", date: "मार्च 4, 2038", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2038", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 23, 2038", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "सितंबर 3, 2038", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 8, 2038", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 27, 2038", icon: "diya" },
+    
+    // 2039 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2039", icon: "calendar" },
+    { name: "होली", date: "मार्च 22, 2039", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2039", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 12, 2039", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 24, 2039", icon: "calendar" },
+    { name: "दशहरा", date: "सितंबर 26, 2039", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 15, 2039", icon: "diya" },
+    
+    // 2040 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2040", icon: "calendar" },
+    { name: "होली", date: "मार्च 11, 2040", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2040", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "जुलाई 31, 2040", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 11, 2040", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 14, 2040", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 2, 2040", icon: "diya" },
+    
+    // 2041 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2041", icon: "calendar" },
+    { name: "होली", date: "मार्च 1, 2041", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2041", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 20, 2041", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 31, 2041", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 4, 2041", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 23, 2041", icon: "diya" },
+    
+    // 2042 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2042", icon: "calendar" },
+    { name: "होली", date: "मार्च 20, 2042", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2042", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 9, 2042", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 20, 2042", icon: "calendar" },
+    { name: "दशहरा", date: "सितंबर 23, 2042", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 11, 2042", icon: "diya" },
+    
+    // 2043 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2043", icon: "calendar" },
+    { name: "होली", date: "मार्च 9, 2043", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2043", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 28, 2043", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "सितंबर 8, 2043", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 13, 2043", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 1, 2043", icon: "diya" },
+    
+    // 2044 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2044", icon: "calendar" },
+    { name: "होली", date: "मार्च 27, 2044", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2044", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 16, 2044", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 27, 2044", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 1, 2044", icon: "calendar" },
+    { name: "दिवाली", date: "अक्टूबर 20, 2044", icon: "diya" },
+    
+    // 2045 Festivals
+    { name: "नव वर्ष", date: "जनवरी 1, 2045", icon: "calendar" },
+    { name: "होली", date: "मार्च 16, 2045", icon: "calendar" },
+    { name: "स्वतंत्रता दिवस", date: "अगस्त 15, 2045", icon: "calendar" },
+    { name: "रक्षा बंधन", date: "अगस्त 5, 2045", icon: "calendar" },
+    { name: "जन्माष्टमी", date: "अगस्त 17, 2045", icon: "calendar" },
+    { name: "दशहरा", date: "अक्टूबर 20, 2045", icon: "calendar" },
+    { name: "दिवाली", date: "नवंबर 8, 2045", icon: "diya" },
 ];
 
 export async function getFestivalsForMonth(year: number, month: number): Promise<Festival[]> {
