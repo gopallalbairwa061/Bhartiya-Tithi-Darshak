@@ -13,8 +13,10 @@ import { LogoIcon } from "@/components/icons/logo-icon";
 import { SubscribeBanner } from "@/components/subscribe-banner";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, XCircle, ShieldQuestion, FileText, Info } from "lucide-react";
+import { BrainCircuit, RefreshCw, PartyPopper, Home as HomeIcon, CheckCircle, KeyRound, ShieldQuestion, FileText, Info } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ApiKeyManager } from "@/components/api-key-manager";
 import { Textarea } from "@/components/ui/textarea";
 import { askPanchang } from "@/ai/flows/ask-panchang-flow";
 import { generateQuestions, evaluateAnswer, QuizQuestion, EvaluateAnswerOutput } from "@/ai/flows/panchang-quiz-flow";
@@ -401,6 +403,24 @@ export default function Home() {
                     </h1>
                 </div>
                 <div className="flex items-center gap-2">
+                   <Dialog>
+                     <DialogTrigger asChild>
+                        <Button variant="outline">
+                           <KeyRound className="mr-2 h-4 w-4" />
+                           API कुंजी
+                        </Button>
+                     </DialogTrigger>
+                     <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>API कुंजी प्रबंधक</DialogTitle>
+                            <DialogDescription>
+                                अपनी API कुंजी यहां बनाएं और प्रबंधित करें।
+                            </DialogDescription>
+                        </DialogHeader>
+                        <ApiKeyManager />
+                     </DialogContent>
+                   </Dialog>
+
                    <Sheet open={isQuizOpen} onOpenChange={setIsQuizOpen}>
                     <SheetTrigger asChild>
                          <Button variant="outline">
