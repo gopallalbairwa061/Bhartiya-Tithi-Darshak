@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, getYear, getMonth, getDay, eachDayOfInterval, startOfMonth, endOfMonth, isSameMonth } from "date-fns";
+import { format, getYear, getMonth, getDay, eachDayOfInterval, startOfMonth, endOfMonth, isSameMonth, isToday } from "date-fns";
 import { hi } from "date-fns/locale";
 import { getPanchangForMonth, PanchangData } from "@/services/panchang";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -133,6 +133,7 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
     const dayNumber = date.getDate();
     const isSunday = getDay(date) === 0;
     const isSelected = format(date, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
+    const isCurrentDate = isToday(date);
 
     return (
        <div
@@ -140,11 +141,12 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
         className={cn(
             "flex w-full border-b border-border/50 p-4 gap-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200",
             isSelected && "bg-primary/10",
-            isSunday && !isSelected && "bg-destructive/5"
+            isSunday && !isSelected && "bg-destructive/5",
+            isCurrentDate && "bg-accent/10"
         )}
       >
         <div className="flex flex-col items-center justify-center w-24">
-            <span className={cn("text-5xl font-bold tracking-tighter text-chart-1", isSunday && "text-destructive")}>
+            <span className={cn("text-5xl font-bold tracking-tighter text-chart-1", isSunday && "text-destructive", isCurrentDate && "text-accent")}>
                 {dayNumber.toLocaleString('hi-IN')}
             </span>
             <span className="text-sm font-medium text-muted-foreground -mt-1">{format(date, 'cccc', { locale: hi })}</span>
