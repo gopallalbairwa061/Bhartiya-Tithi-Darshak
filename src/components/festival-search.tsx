@@ -61,7 +61,9 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
 
 
   const filteredFestivals = useMemo(() => {
-    if (!searchTerm) return yearlyFestivals;
+    if (!searchTerm) {
+      return yearlyFestivals;
+    }
     return yearlyFestivals.filter((festival) =>
       festival.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -99,7 +101,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
                 <Input
                   type="search"
                   aria-label="त्योहारों या कार्यक्रमों के लिए खोजें"
-                  placeholder="त्योहार या कार्यक्रम खोजें..."
+                  placeholder="इस वर्ष के त्यौहार, व्रत और छुट्टियां खोजें..."
                   className="pl-11 h-11 text-base"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -109,7 +111,7 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
               <ul className="space-y-4">
                 {isYearlyLoading ? (
                     <div className="flex flex-col items-center justify-center h-48 text-center">
-                        <p className="text-muted-foreground">त्योहार लोड हो रहे हैं...</p>
+                        <p className="text-muted-foreground">इस वर्ष के त्यौहार लोड हो रहे हैं...</p>
                     </div>
                 ) : filteredFestivals.length > 0 ? (
                   filteredFestivals.map((festival) => (
@@ -124,7 +126,9 @@ export function FestivalSearch({ onDateSelect }: FestivalSearchProps) {
                 ) : (
                   <div className="flex flex-col items-center justify-center h-48 text-center">
                     <Search className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                    <p className="text-muted-foreground">इस वर्ष कोई त्यौहार नहीं मिला।</p>
+                    <p className="text-muted-foreground">
+                        {searchTerm ? `"${searchTerm}" से कोई त्यौहार नहीं मिला।` : "इस वर्ष के लिए कोई त्यौहार नहीं मिला।"}
+                    </p>
                   </div>
                 )}
               </ul>
