@@ -134,7 +134,15 @@ const calculateMuhurats = (date: Date, sunrise: number, sunset: number) => {
 };
 
 
-export async function getPanchangForMonth(year: number, month: number): Promise<PanchangData[]> {
+export async function getPanchangForMonth(year: number, month: number, options?: { fromApi: boolean }): Promise<PanchangData[]> {
+    if (!options?.fromApi) {
+        const res = await fetch(`/api/panchang?year=${year}&month=${month}`);
+        if (!res.ok) {
+            throw new Error('Failed to fetch panchang data from API');
+        }
+        return res.json();
+    }
+    
   const startDate = startOfMonth(new Date(year, month));
   const endDate = endOfMonth(startDate);
   const dates = eachDayOfInterval({ start: startDate, end: endDate });

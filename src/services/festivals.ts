@@ -377,9 +377,14 @@ const allFestivals: Festival[] = [
     { name: "क्रिसमस", date: "दिसंबर 25, 2045", icon: "calendar" },
 ];
 
-export async function getFestivalsForMonth(year: number, month: number): Promise<Festival[]> {
-    // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 100));
+export async function getFestivalsForMonth(year: number, month: number, options?: { fromApi: boolean }): Promise<Festival[]> {
+    if (!options?.fromApi) {
+        const res = await fetch(`/api/festivals/month?year=${year}&month=${month}`);
+        if (!res.ok) {
+            throw new Error('Failed to fetch monthly festivals from API');
+        }
+        return res.json();
+    }
 
     return allFestivals.filter(festival => {
         const festivalDate = parseHindiDate(festival.date);
@@ -390,10 +395,15 @@ export async function getFestivalsForMonth(year: number, month: number): Promise
     });
 }
 
-export async function getFestivalsForYear(year: number): Promise<Festival[]> {
-    // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 100));
-
+export async function getFestivalsForYear(year: number, options?: { fromApi: boolean }): Promise<Festival[]> {
+    if (!options?.fromApi) {
+        const res = await fetch(`/api/festivals/year?year=${year}`);
+        if (!res.ok) {
+            throw new Error('Failed to fetch yearly festivals from API');
+        }
+        return res.json();
+    }
+    
     return allFestivals.filter(festival => {
         const festivalDate = parseHindiDate(festival.date);
         if (festivalDate) {
