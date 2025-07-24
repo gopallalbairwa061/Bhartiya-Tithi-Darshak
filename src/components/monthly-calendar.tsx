@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -52,11 +52,15 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [panchangData, setPanchangData] = useState<Map<string, PanchangData>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const todayRef = useRef<HTMLDivElement>(null);
+  const [initialScrollDone, setInitialScrollDone] = useState(false);
 
   useEffect(() => {
     // Only fetch if the new month is different from the current panchang month
     const currentPanchangMonth = panchangData.size > 0 ? new Date(panchangData.keys().next().value) : null;
     if (!currentPanchangMonth || !isSameMonth(currentMonth, currentPanchangMonth)) {
+      setInitialScrollDone(false); // Reset scroll when month changes
       const fetchPanchangData = async () => {
         setIsLoading(true);
         const year = getYear(currentMonth);
@@ -79,6 +83,22 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
   useEffect(() => {
     onDateSelect(selectedDate);
   }, [selectedDate, onDateSelect]);
+
+  useEffect(() => {
+    if (!isLoading && !initialScrollDone && todayRef.current && scrollContainerRef.current) {
+        const container = scrollContainerRef.current;
+        const todayElement = todayRef.current;
+        
+        const containerTop = container.offsetTop;
+        const todayTop = todayElement.offsetTop;
+
+        container.scrollTo({
+            top: todayTop - containerTop - (container.clientHeight / 2) + (todayElement.clientHeight / 2),
+            behavior: 'smooth',
+        });
+        setInitialScrollDone(true);
+    }
+  }, [isLoading, initialScrollDone]);
 
 
   const festivalsByDate = useMemo(() => {
@@ -126,7 +146,7 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
     return <CalendarHeart className="h-4 w-4 text-chart-4" />;
   };
 
-  const DayWithDetails = ({ date }: { date: Date }) => {
+  const DayWithDetails = React.forwardRef<HTMLDivElement, { date: Date }>(({ date }, ref) => {
     const dateStr = format(date, "yyyy-MM-dd");
     const dayFestivals = festivalsByDate.get(dateStr);
     const dayPanchang = panchangData.get(dateStr);
@@ -137,6 +157,7 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
 
     return (
        <div
+        ref={ref}
         onClick={() => setSelectedDate(date)}
         className={cn(
             "flex w-full border-b border-border/50 p-4 gap-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200",
@@ -180,7 +201,8 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
         </div>
       </div>
     );
-  };
+  });
+  DayWithDetails.displayName = "DayWithDetails";
   
   return (
     <div className="space-y-4">
@@ -215,7 +237,7 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
         </Button>
       </div>
       
-      <div className="border border-border/50 rounded-md max-h-[calc(100vh-32rem)] min-h-[400px] overflow-y-auto">
+      <div ref={scrollContainerRef} className="border border-border/50 rounded-md max-h-[calc(100vh-32rem)] min-h-[400px] overflow-y-auto">
         {isLoading ? (
             Array.from({ length: 10 }).map((_, i) => (
                 <div key={i} className="flex w-full border-b border-border/50 p-4 gap-4">
@@ -232,7 +254,7 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
             ))
         ) : (
             daysInMonth.map((day) => (
-                <DayWithDetails key={day.toISOString()} date={day} />
+                <DayWithDetails key={day.toISOString()} date={day} ref={isToday(day) ? todayRef : undefined} />
             ))
         )}
       </div>
