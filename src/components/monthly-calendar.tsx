@@ -142,7 +142,7 @@ export function MonthlyCalendar({ festivals, onDateSelect, onMonthChange, curren
             "flex w-full border-b border-border/50 p-4 gap-4 cursor-pointer hover:bg-muted/50 transition-colors duration-200",
             isSelected && "bg-primary/10",
             isSunday && !isSelected && "bg-destructive/5",
-            isCurrentDate && "bg-accent/10"
+            isCurrentDate && "bg-accent/10 animate-blink"
         )}
       >
         <div className="flex flex-col items-center justify-center w-24">
