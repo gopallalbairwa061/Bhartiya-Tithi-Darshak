@@ -403,24 +403,6 @@ export default function Home() {
                     </h1>
                 </div>
                 <div className="flex items-center gap-2">
-                   <Dialog>
-                     <DialogTrigger asChild>
-                        <Button variant="outline">
-                           <KeyRound className="mr-2 h-4 w-4" />
-                           API कुंजी
-                        </Button>
-                     </DialogTrigger>
-                     <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>API कुंजी प्रबंधक</DialogTitle>
-                            <DialogDescription>
-                                अपनी API कुंजी यहां बनाएं और प्रबंधित करें।
-                            </DialogDescription>
-                        </DialogHeader>
-                        <ApiKeyManager />
-                     </DialogContent>
-                   </Dialog>
-
                    <Sheet open={isQuizOpen} onOpenChange={setIsQuizOpen}>
                     <SheetTrigger asChild>
                          <Button variant="outline">
@@ -469,6 +451,22 @@ export default function Home() {
         <div className="flex justify-center items-center gap-4">
             <p>&copy; {new Date().getFullYear()} भारतीय तिथि दर्शक। सर्वाधिकार सुरक्षित।</p>
             <Link href="/terms" className="hover:text-primary">नियम और शर्तें</Link>
+             <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="link" className="text-muted-foreground hover:text-primary p-0 h-auto">
+                        API कुंजी
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>API कुंजी प्रबंधक</DialogTitle>
+                        <DialogDescription>
+                            अपनी API कुंजी यहां बनाएं और प्रबंधित करें।
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ApiKeyManager />
+                </DialogContent>
+            </Dialog>
         </div>
         <p className="mt-2">भारत में निर्मित महेंद्र बैरवा द्वारा</p>
       </footer>
